@@ -60,7 +60,7 @@ const PostContent: React.FC = () => {
 
     return (
         <Box sx={{ mt: 2, mx: 'auto', maxWidth: 800, p: 2 }}>
-            <Paper elevation={3} sx={{ p: 3, backgroundColor: '#424242', color: '#ffffff' }}>
+            <Paper elevation={3} sx={{ p: 3 }}>
                 <Typography variant="h4" gutterBottom>
                     {post.title}
                 </Typography>

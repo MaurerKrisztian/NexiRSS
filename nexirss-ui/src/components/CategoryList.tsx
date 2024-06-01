@@ -1,17 +1,27 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { List, ListItem, ListItemText, Typography, CircularProgress, Box, Divider } from '@mui/material';
+import {List, Typography, CircularProgress, Box, Divider, ListItem, ListItemText} from '@mui/material';
 import axios from 'axios';
 import { Link as RouterLink } from 'react-router-dom';
+import FeedItemPreview from './FeedItemPreview';
 
 interface Feed {
     _id: string;
     category: string;
 }
 
+interface AudioInfo {
+    length?: number;
+    type: string;
+    url: string;
+}
+
 interface FeedItem {
     _id: string;
     title: string;
+    link: string;
     pubDate: string;
+    content: string;
+    audioInfo?: AudioInfo;
     feed: {
         title: string;
     };
@@ -90,12 +100,10 @@ const CategoryList: React.FC = () => {
             </Typography>
             <List>
                 {items.map(item => (
-                    <ListItem key={item._id} component={RouterLink} to={`/items/${item._id}`} button>
-                        <ListItemText
-                            primary={item.title}
-                            secondary={`${new Date(item.pubDate).toLocaleString()} - ${item.feed.title}`}
-                        />
-                    </ListItem>
+                    <FeedItemPreview
+                        key={item._id}
+                        item={item}
+                    />
                 ))}
             </List>
             {loading && <CircularProgress />}

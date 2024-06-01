@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { List, ListItem, ListItemText, Typography, CircularProgress, Box, IconButton, Paper } from '@mui/material';
+import { List, Typography, CircularProgress, Box, Paper } from '@mui/material';
 import axios from 'axios';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import { Link as RouterLink } from 'react-router-dom';
+import FeedItemPreview from './FeedItemPreview';
+
+interface AudioInfo {
+    length?: number;
+    type: string;
+    url: string;
+}
 
 interface FeedItem {
     _id: string;
@@ -11,6 +16,7 @@ interface FeedItem {
     link: string;
     pubDate: string;
     content: string;
+    audioInfo?: AudioInfo;
 }
 
 const CategoryItems: React.FC = () => {
@@ -22,7 +28,23 @@ const CategoryItems: React.FC = () => {
         const fetchItems = async () => {
             try {
                 const response = await axios.get(`http://localhost:3000/rss-feed/categories/${category}/items`);
-                setItems(response.data);
+                const itemsWithAudioLength = await Promise.all(
+                    response.data.map(async (item: FeedItem) => {
+                        if (item.audioInfo && !item.audioInfo.length) {
+                            try {
+                                const headResponse = await axios.head(item.audioInfo.url);
+                                const contentLength = headResponse.headers['content-length'];
+                                if (contentLength) {
+                                    item.audioInfo.length = Number(contentLength);
+                                }
+                            } catch (error) {
+                                console.error('Error fetching audio length:', error);
+                            }
+                        }
+                        return item;
+                    })
+                );
+                setItems(itemsWithAudioLength);
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching items:', error);
@@ -44,16 +66,10 @@ const CategoryItems: React.FC = () => {
             <Paper elevation={3} sx={{ p: 2 }}>
                 <List>
                     {items.map((item) => (
-                        <ListItem key={item._id} component={RouterLink} to={`/items/${item._id}`} button>
-                            <ListItemText primary={item.title} secondary={new Date(item.pubDate).toLocaleString()} />
-                            <IconButton edge="end" aria-label="open-in-new" onClick={(e) => {
-                                e.stopPropagation();
-                                e.preventDefault();
-                                window.open(item.link, '_blank');
-                            }}>
-                                <OpenInNewIcon />
-                            </IconButton>
-                        </ListItem>
+                        <FeedItemPreview
+                            key={item._id}
+                            item={item}
+                        />
                     ))}
                 </List>
             </Paper>

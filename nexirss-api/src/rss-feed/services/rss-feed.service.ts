@@ -28,6 +28,7 @@ export class RssFeedService {
       let feed = await this.feedModel.findOne({ url });
       if (!feed) {
         const feedData = await this.parser.parseURL(url);
+        console.log(JSON.stringify(feedData, null, 2));
         feed = new this.feedModel({
           url,
           title: feedData.title,
@@ -41,6 +42,7 @@ export class RssFeedService {
       }
 
       const feedData = await this.parser.parseURL(url);
+      console.log(JSON.stringify(feedData, null, 2));
       let newItems = 0;
 
       const processData = feedData.items.slice(0, maxItems);
