@@ -5,6 +5,19 @@ import { Document, Schema as MongooseSchema } from 'mongoose';
 import * as process from 'node:process';
 import { Feed } from './feed.schema';
 
+@Schema({ _id: false })
+export class AudioInfo {
+  @Prop()
+  length: string;
+
+  @Prop()
+  type: string;
+
+  @Prop()
+  url: string;
+}
+
+const AudioInfoSchema = SchemaFactory.createForClass(AudioInfo);
 @Schema()
 export class RssItem extends Document {
   @Prop({ required: true })
@@ -19,6 +32,9 @@ export class RssItem extends Document {
   @Prop({ required: true })
   content: string;
 
+  @Prop({ type: AudioInfoSchema, required: false })
+  audioInfo?: AudioInfo;
+
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Feed', required: true })
   feed: Feed;
 
@@ -27,6 +43,10 @@ export class RssItem extends Document {
 }
 
 export const RssItemSchema = SchemaFactory.createForClass(RssItem);
+
+RssItemSchema.virtual('isAudioAvailable').get(function (this: RssItem) {
+  return !!this.audioInfo;
+});
 
 export const fetchEmbedding = async (text: string): Promise<number[]> => {
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });

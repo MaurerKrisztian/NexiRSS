@@ -17,9 +17,9 @@ export class RssFeedController {
 
   @Post('fetch')
   async fetchRssFeed(
-    @Body() body: { url: string; category: string },
+    @Body() body: { url: string; category: string, maxItems?: number },
   ): Promise<{ newItems: number; totalItems: number }> {
-    return this.rssFeedService.fetchAndSaveRss(body.url, body.category);
+    return this.rssFeedService.fetchAndSaveRss(body.url, body.category, body?.maxItems);
   }
 
   @Post('vector-search')

@@ -4,12 +4,19 @@ import { Box, Typography, IconButton, Paper } from '@mui/material';
 import axios from 'axios';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
+interface AudioInfo {
+    length: string;
+    type: string;
+    url: string;
+}
+
 interface Post {
     _id: string;
     title: string;
     link: string;
     pubDate: string;
     content: string;
+    audioInfo?: AudioInfo;
 }
 
 const PostContent: React.FC = () => {
@@ -42,6 +49,17 @@ const PostContent: React.FC = () => {
                 <Typography variant="body2" color="textSecondary" gutterBottom>
                     {new Date(post.pubDate).toLocaleString()}
                 </Typography>
+                {post.audioInfo && (
+                    <Box sx={{ mt: 2 }}>
+                        <audio controls style={{ width: '100%' }}>
+                            <source src={post.audioInfo.url} type={post.audioInfo.type} />
+                            Your browser does not support the audio element.
+                        </audio>
+                        <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+                            Audio length: {Math.floor(Number(post.audioInfo.length) / 60)} minutes
+                        </Typography>
+                    </Box>
+                )}
                 <Typography variant="body1" gutterBottom>
                     {post.content.split('\n').map((line, index) => (
                         <React.Fragment key={index}>

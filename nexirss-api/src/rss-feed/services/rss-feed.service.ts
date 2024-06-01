@@ -22,6 +22,7 @@ export class RssFeedService {
   async fetchAndSaveRss(
     url: string,
     category: string,
+    maxItems = 12,
   ): Promise<{ newItems: number; totalItems: number }> {
     try {
       let feed = await this.feedModel.findOne({ url });
@@ -42,25 +43,40 @@ export class RssFeedService {
       const feedData = await this.parser.parseURL(url);
       let newItems = 0;
 
-      for (const item of feedData.items) {
+      const processData = feedData.items.slice(0, maxItems);
+      for (const item of processData) {
         const existingItem = await this.rssItemModel.findOne({
           link: item.link,
         });
         if (!existingItem) {
+          const audioInfo = item.enclosure
+            ? {
+                length: item.enclosure.length,
+                type: item.enclosure.type,
+                url: item.enclosure.url,
+              }
+            : undefined;
+
           const rssItem = new this.rssItemModel({
             title: item.title,
             link: item.link,
             pubDate: new Date(item.pubDate),
-            content: item.contentSnippet,
+            content:
+              item['content:encoded'] ||
+              item.content ||
+              item.description ||
+              item.contentSnippet,
             feed: feed._id,
+            audioInfo,
           });
-          await rssItem.save();
+          const res = await rssItem.save();
+          console.log('res: ', res);
           newItems++;
           this.eventEmitter.emit('rss.item.new', rssItem);
         }
       }
 
-      return { newItems, totalItems: feedData.items.length };
+      return { newItems, totalItems: processData.length };
     } catch (error) {
       console.error('RssFeedService', error.message);
       this.logger.error(`Failed to fetch RSS feed from ${url}`, error.stack);

@@ -5,7 +5,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { RssFeedModule } from './rss-feed/rss-feed.module';
 import { ConfigModule } from '@nestjs/config';
 import * as process from 'node:process';
-console.log(process.env.DB_URL);
 @Module({
   imports: [
     ConfigModule.forRoot(),
