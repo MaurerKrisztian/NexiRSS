@@ -1,2 +1,61 @@
 # NexiRSS
-AI powered RSS feed
+
+NexiRSS is an  RSS feed aggregator. It allows you to manage RSS feeds, including podcasts, track your progress on audio content, and includes a future plan to integrate AI triggers for notifications.
+
+## Features
+
+| Feature                    | Description                                                                               | Status            |
+|----------------------------|-------------------------------------------------------------------------------------------|-------------------|
+| Add RSS Feed               | Add new RSS feeds to the system.                                                          | ✅ Implemented     |
+| Fetch RSS Feed             | Fetch and save items from RSS feeds and create embeddings.                                | ✅ Implemented     |
+| Update RSS feeds           | Fetch feeds for new content.                                                              | 🛠️ Working on it |
+| List Feeds                 | Retrieve a list of available RSS feeds.                                                   | ✅ Implemented     |
+| Get Feed Items             | Retrieve items from a specific feed.                                                      | ✅ Implemented     |
+| Get All Items              | Retrieve all items, with pagination support.                                              | ✅ Implemented     |
+| Delete RSS Feed            | Delete an RSS feed and its items.                                                         | ✅ Implemented     |
+| Search Items               | Search items using vector search for similar content.                                     | ✅ Implemented     |
+| Handle Podcasts            | Save audio information for podcasts, including playback position.                         | ✅ Implemented     |
+| Category                   | Add category to feeds.                                                                    | ✅ Implemented     |
+| Audio Playback (UI)        | Play podcasts directly in the UI and save playback position.                              | ✅ Implemented     |
+| Search Bar (UI)            | Search for items with real-time suggestions.                                              | ✅ Implemented     |
+| Infinite Scroll (UI)       | Infinite scroll for loading more items.                                                   | ✅ Implemented     |
+| Dark Mode (UI)             | Modern UI with a dark theme.                                                              | ✅ Implemented     |
+| AI Content Analysis        | Use AI to analyze new articles.                                                           | ❌ Not Implemented |
+| Automated AI Notifications | Automatically send notifications when triggers apply. (The trigger is a prompt to the AI) | ❌ Not Implemented |
+
+## Future Plan
+
+### AI Triggers
+
+- **AI Content Analysis**: Use AI to analyze new articles.
+- **Trigger Descriptions**: Define criteria for triggering notifications or emails.
+- **Automated Notifications**: Automatically send notifications or emails when triggers apply.
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js
+- Atlas MongoDB  https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-overview/
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/NexiRSS.git
+   cd NexiRSS
+   ```
+2. Install dependencies for the API:
+    - create .env file based on .env-template
+    ```bash
+      cd nexirrs-api
+      npm install
+      npm run start
+    ```
+
+3. Install dependencies for the UI:
+    ```bash
+      cd nexirrs-ui
+      npm install
+      npm start
+    ```
