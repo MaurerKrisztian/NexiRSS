@@ -37,7 +37,18 @@ NexiRSS is an  RSS feed aggregator. It allows you to manage RSS feeds, including
 
 - Node.js
 - Atlas MongoDB  https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-overview/
-
+   - Add search index ```  {
+     "mappings": {
+     "dynamic": true,
+     "fields": {
+     "plot_embedding": {
+     "type": "knnVector",
+     "dimensions": 1536,
+     "similarity": "cosine"
+     }
+     }
+     }
+     }```
 ### Installation
 
 1. Clone the repository:
