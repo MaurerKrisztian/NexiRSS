@@ -1,51 +1,68 @@
 import React, { useEffect, useState } from 'react';
-import { List, ListItem, ListItemText, Typography, CircularProgress, Box } from '@mui/material';
+import { Box, Typography, Card, CardActionArea, CardContent, CardMedia, Grid } from '@mui/material';
 import axios from 'axios';
-import { Link as RouterLink } from 'react-router-dom';
 
 interface Feed {
     _id: string;
-    category: string;
+    url: string;
+    title: string;
+    image: string;
+    description: string;
 }
 
-const CategoryList: React.FC = () => {
-    const [categories, setCategories] = useState<string[]>([]);
+const placeholderImage = 'https://via.placeholder.com/150';
+
+const FeedListPage: React.FC = () => {
+    const [feeds, setFeeds] = useState<Feed[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchCategories = async () => {
+        const fetchFeeds = async () => {
             try {
                 const response = await axios.get('http://localhost:3000/rss-feed/feeds');
-                const feeds: Feed[] = response.data;
-                const uniqueCategories = Array.from(new Set(feeds.map(feed => feed.category)));
-                setCategories(uniqueCategories);
+                setFeeds(response.data);
                 setLoading(false);
             } catch (error) {
-                console.error('Error fetching categories:', error);
+                console.error('Error fetching feeds:', error);
             }
         };
 
-        fetchCategories();
+        fetchFeeds();
     }, []);
 
     if (loading) {
-        return <CircularProgress />;
+        return <Typography>Loading...</Typography>;
     }
 
     return (
         <Box sx={{ mt: 2, mx: 'auto', maxWidth: 800, p: 2 }}>
             <Typography variant="h4" gutterBottom>
-                Categories
+                Subscribed Feeds
             </Typography>
-            <List>
-                {categories.map((category, index) => (
-                    <ListItem key={index} component={RouterLink} to={`/categories/${category}/items`} button>
-                        <ListItemText primary={category} />
-                    </ListItem>
+            <Grid container spacing={2}>
+                {feeds.map((feed) => (
+                    <Grid item key={feed._id} xs={12} sm={6} md={4}>
+                        <Card>
+                            <CardActionArea href={`http://localhost:3001/feeds/${feed._id}/items`}>
+                                <CardMedia
+                                    component="img"
+                                    alt={feed.title}
+                                    height="140"
+                                    image={feed.image || placeholderImage}
+                                    title={feed.title}
+                                />
+                                <CardContent>
+                                    <Typography variant="h6" gutterBottom>
+                                        {feed.title}
+                                    </Typography>
+                                </CardContent>
+                            </CardActionArea>
+                        </Card>
+                    </Grid>
                 ))}
-            </List>
+            </Grid>
         </Box>
     );
 };
 
-export default CategoryList;
+export default FeedListPage;

@@ -29,10 +29,10 @@ const App: React.FC = () => {
                 Home
               </Button>
               <Button color="inherit" component={Link} to="/feeds">
-                RSS Feeds
+                Feeds
               </Button>
               <Button color="inherit" component={Link} to="/create">
-                Create Feed
+                Manage Feed
               </Button>
             </Toolbar>
           </AppBar>
