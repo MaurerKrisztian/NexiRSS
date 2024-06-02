@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { ListItem, ListItemText, IconButton } from '@mui/material';
+import { ListItem, ListItemText, IconButton, Avatar, Box } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import PodcastIcon from '@mui/icons-material/Mic';
 
@@ -17,6 +17,7 @@ interface FeedItem {
     pubDate: string;
     content: string;
     audioInfo?: AudioInfo;
+    feed?: {image?: string}
 }
 
 interface FeedItemPreviewProps {
@@ -34,12 +35,20 @@ const bytesToSeconds = (bytes: number, bitrate = 128000) => {
     return bytes / (bitrate / 8);
 };
 
+const placeholderImage = 'https://via.placeholder.com/150';
+
 const FeedItemPreview: React.FC<FeedItemPreviewProps> = ({ item }) => {
     const audioPosition = localStorage.getItem(`audioPosition-${item._id}`);
     const audioLength = item.audioInfo ? bytesToSeconds(Number(item.audioInfo.length)) : 0;
 
     return (
         <ListItem component={RouterLink} to={`/items/${item._id}`} button>
+            <Avatar
+                variant="square"
+                src={item?.feed?.image || placeholderImage}
+                alt={item.title}
+                sx={{ width: 56, height: 56, marginRight: 2 }}
+            />
             <ListItemText
                 primary={item.title}
                 secondary={

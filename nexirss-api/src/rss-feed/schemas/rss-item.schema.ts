@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import OpenAI from 'openai';
 
 import { Document, Schema as MongooseSchema } from 'mongoose';
+import { ObjectId } from 'bson';
 import * as process from 'node:process';
 import { Feed } from './feed.schema';
 
@@ -34,6 +35,9 @@ export class RssItem extends Document {
 
   @Prop({ type: AudioInfoSchema, required: false })
   audioInfo?: AudioInfo;
+
+  @Prop({ required: false })
+  ttsAudioId: string | ObjectId;
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Feed', required: true })
   feed: Feed;

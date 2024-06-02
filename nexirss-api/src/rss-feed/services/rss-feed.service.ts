@@ -22,7 +22,7 @@ export class RssFeedService {
   async fetchAndSaveRss(
     url: string,
     category: string,
-    maxItems = 12,
+    maxItems = 3,
   ): Promise<{ newItems: number; totalItems: number }> {
     try {
       let feed = await this.feedModel.findOne({ url });
@@ -102,11 +102,11 @@ export class RssFeedService {
   }
 
   async getFeedItems(feedId: string): Promise<RssItem[]> {
-    return this.rssItemModel.find({ feed: feedId }).exec();
+    return this.rssItemModel.find({ feed: feedId }).populate('feed').exec();
   }
 
   async getItemById(id: string): Promise<RssItem> {
-    return this.rssItemModel.findById(id).exec();
+    return this.rssItemModel.findById(id).populate('feed').exec();
   }
 
   async getAllFeedItemsOrderedByDate(): Promise<RssItem[]> {
@@ -120,6 +120,7 @@ export class RssFeedService {
       .sort({ pubDate: -1 })
       .skip(skip)
       .limit(limit)
+      .populate('feed')
       .exec();
   }
 
@@ -129,6 +130,7 @@ export class RssFeedService {
     return this.rssItemModel
       .find({ feed: { $in: feedIds } })
       .sort({ pubDate: -1 })
+      .populate('feed')
       .exec();
   }
 

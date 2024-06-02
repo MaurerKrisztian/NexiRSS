@@ -84,12 +84,7 @@ const PostContent: React.FC = () => {
                     </Box>
                 )}
                 <Typography variant="body1" gutterBottom>
-                    {post.content.split('\n').map((line, index) => (
-                        <React.Fragment key={index}>
-                            {line}
-                            <br />
-                        </React.Fragment>
-                    ))}
+                    <div dangerouslySetInnerHTML={{ __html: post.content }} />
                 </Typography>
                 <IconButton
                     color="primary"

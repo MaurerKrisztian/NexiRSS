@@ -23,7 +23,8 @@ interface FeedItem {
     pubDate: string;
     content: string;
     audioInfo?: AudioInfo;
-    feed: {
+    feed?: {
+        image?: string
         title: string;
     };
 }

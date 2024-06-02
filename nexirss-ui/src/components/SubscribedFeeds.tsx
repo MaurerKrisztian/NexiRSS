@@ -39,7 +39,25 @@ const SubscribedFeeds: React.FC = () => {
             <Typography variant="h4" gutterBottom>
                 Subscribed Feeds
             </Typography>
-            <Box sx={{ display: 'flex', overflowX: 'auto', p: 1 }}>
+            <Box
+                sx={{
+                    display: 'flex',
+                    overflowX: 'auto',
+                    p: 1,
+                    '&::-webkit-scrollbar': {
+                        height: '8px',
+                    },
+                    '&::-webkit-scrollbar-track': {
+                        background: '#2b2b2b',
+                        borderRadius: '4px',
+                    },
+                    '&::-webkit-scrollbar-thumb': {
+                        backgroundColor: '#6c6c6c',
+                        borderRadius: '4px',
+                        border: '2px solid #2b2b2b',
+                    },
+                }}
+            >
                 <Grid container spacing={2} wrap="nowrap">
                     {feeds.map((feed) => (
                         <Grid item key={feed._id} xs={12} sm={6} md={4} sx={{ flexShrink: 0 }}>
