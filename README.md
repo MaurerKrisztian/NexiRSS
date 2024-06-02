@@ -22,6 +22,10 @@ NexiRSS is an  RSS feed aggregator. It allows you to manage RSS feeds, including
 | Dark Mode (UI)             | Modern UI with a dark theme.                                                              | ✅ Implemented     |
 | AI Content Analysis        | Use AI to analyze new articles.                                                           | ❌ Not Implemented |
 | Automated AI Notifications | Automatically send notifications when triggers apply. (The trigger is a prompt to the AI) | ❌ Not Implemented |
+| Users                      | Google auth                                                                               | ❌ Not Implemented |
+| Save items                 |                                                                                | ❌ Not Implemented |
+| History                    |                                                                                | ❌ Not Implemented |
+| Main feed                  |                                                                                | 🛠️ Working on it |
 
 ## Future Plan
 
