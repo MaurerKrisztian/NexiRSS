@@ -35,6 +35,10 @@ export class RssFeedController {
   async getAllFeeds(): Promise<Feed[]> {
     return this.rssFeedService.getAllFeeds();
   }
+  @Get('feeds/:feedId')
+  async getFeedById(@Param('feedId') feedId: string): Promise<Feed> {
+    return this.rssFeedService.getFeedById(feedId);
+  }
 
   @Get('feeds/:feedId/items')
   async getFeedItems(@Param('feedId') feedId: string): Promise<RssItem[]> {

@@ -181,4 +181,8 @@ export class RssFeedService {
       ])
       .exec();
   }
+
+  getFeedById(feedId: string) {
+    return this.feedModel.findOne({ _id: feedId }).exec();
+  }
 }
