@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import {List, Typography, CircularProgress, Box, Divider, ListItem, ListItemText} from '@mui/material';
+import { List, Typography, CircularProgress, Box, Divider } from '@mui/material';
 import axios from 'axios';
-import { Link as RouterLink } from 'react-router-dom';
 import FeedItemPreview from './FeedItemPreview';
+import SubscribedFeeds from './SubscribedFeeds';
+import CategoriesList from './CategoriesList';
 
 interface Feed {
     _id: string;
@@ -27,7 +28,7 @@ interface FeedItem {
     };
 }
 
-const CategoryList: React.FC = () => {
+const Home: React.FC = () => {
     const [categories, setCategories] = useState<string[]>([]);
     const [items, setItems] = useState<FeedItem[]>([]);
     const [loading, setLoading] = useState(true);
@@ -39,7 +40,7 @@ const CategoryList: React.FC = () => {
             try {
                 const response = await axios.get('http://localhost:3000/rss-feed/feeds');
                 const feeds: Feed[] = response.data;
-                const uniqueCategories = Array.from(new Set(feeds.map(feed => feed.category)));
+                const uniqueCategories = Array.from(new Set(feeds.map(feed => feed.category))).filter(e => e !== undefined);
                 setCategories(uniqueCategories);
                 setLoading(false);
             } catch (error) {
@@ -84,16 +85,8 @@ const CategoryList: React.FC = () => {
 
     return (
         <Box sx={{ mt: 2, mx: 'auto', maxWidth: 800, p: 2 }}>
-            <Typography variant="h4" gutterBottom>
-                Categories
-            </Typography>
-            <List>
-                {categories.map((category, index) => (
-                    <ListItem key={index} component={RouterLink} to={`/categories/${category}/items`} button>
-                        <ListItemText primary={category} />
-                    </ListItem>
-                ))}
-            </List>
+            <SubscribedFeeds />
+            <CategoriesList categories={categories} />
             <Divider sx={{ my: 2 }} />
             <Typography variant="h4" gutterBottom>
                 New items
@@ -111,4 +104,4 @@ const CategoryList: React.FC = () => {
     );
 };
 
-export default CategoryList;
+export default Home;

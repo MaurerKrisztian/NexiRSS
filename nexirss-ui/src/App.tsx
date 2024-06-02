@@ -7,7 +7,7 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import FeedList from './components/FeedList';
 import FeedForm from './components/FeedForm';
 import PostContent from './components/PostContent';
-import CategoryList from './components/CategoryList';
+import Home from './components/Home';
 import CategoryItems from './components/CategoryItems';
 import FeedItemsByFeedId from './components/FeedItemsByFeedId';
 import SearchBar from './components/SearchBar';
@@ -39,7 +39,7 @@ const App: React.FC = () => {
           <Container>
             <Box mt={2}>
               <Routes>
-                <Route path="/" element={<CategoryList />} />
+                <Route path="/" element={<Home />} />
                 <Route path="/feeds" element={<FeedList />} />
                 <Route path="/create" element={<FeedForm />} />
                 <Route path="/feeds/:feedId/items" element={<FeedItemsByFeedId />} />

@@ -9,6 +9,12 @@ export class Feed extends Document {
   @Prop()
   title: string;
 
+  @Prop({ required: false })
+  image: string;
+
+  @Prop()
+  description: string;
+
   @Prop()
   category: string;
 }

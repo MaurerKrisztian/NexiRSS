@@ -4,28 +4,29 @@ NexiRSS is an  RSS feed aggregator. It allows you to manage RSS feeds, including
 
 ## Features
 
-| Feature                    | Description                                                                               | Status            |
-|----------------------------|-------------------------------------------------------------------------------------------|-------------------|
-| Add RSS Feed               | Add new RSS feeds to the system.                                                          | ✅ Implemented     |
-| Fetch RSS Feed             | Fetch and save items from RSS feeds and create embeddings.                                | ✅ Implemented     |
-| Update RSS feeds           | Fetch feeds for new content.                                                              | 🛠️ Working on it |
-| List Feeds                 | Retrieve a list of available RSS feeds.                                                   | ✅ Implemented     |
-| Get Feed Items             | Retrieve items from a specific feed.                                                      | ✅ Implemented     |
-| Get All Items              | Retrieve all items, with pagination support.                                              | ✅ Implemented     |
-| Delete RSS Feed            | Delete an RSS feed and its items.                                                         | ✅ Implemented     |
-| Search Items               | Search items using vector search for similar content.                                     | ✅ Implemented     |
-| Handle Podcasts            | Save audio information for podcasts, including playback position.                         | ✅ Implemented     |
-| Category                   | Add category to feeds.                                                                    | ✅ Implemented     |
-| Audio Playback (UI)        | Play podcasts directly in the UI and save playback position.                              | ✅ Implemented     |
-| Search Bar (UI)            | Search for items with real-time suggestions.                                              | ✅ Implemented     |
-| Infinite Scroll (UI)       | Infinite scroll for loading more items.                                                   | ✅ Implemented     |
-| Dark Mode (UI)             | Modern UI with a dark theme.                                                              | ✅ Implemented     |
-| AI Content Analysis        | Use AI to analyze new articles.                                                           | ❌ Not Implemented |
-| Automated AI Notifications | Automatically send notifications when triggers apply. (The trigger is a prompt to the AI) | ❌ Not Implemented |
-| Users                      | Google auth                                                                               | ❌ Not Implemented |
-| Save items                 |                                                                                | ❌ Not Implemented |
-| History                    |                                                                                | ❌ Not Implemented |
-| Main feed                  |                                                                                | 🛠️ Working on it |
+| Feature                    | Description                                                                               | Status             |
+|----------------------------|-------------------------------------------------------------------------------------------|--------------------|
+| Add RSS Feed               | Add new RSS feeds to the system.                                                          | ✅ Implemented      |
+| Fetch RSS Feed             | Fetch and save items from RSS feeds and create embeddings.                                | ✅ Implemented      |
+| Update RSS feeds           | Fetch feeds for new content.                                                              | 🛠️ Working on it  |
+| List Feeds                 | Retrieve a list of available RSS feeds.                                                   | ✅ Implemented      |
+| Get Feed Items             | Retrieve items from a specific feed.                                                      | ✅ Implemented      |
+| Get All Items              | Retrieve all items, with pagination support.                                              | ✅ Implemented      |
+| Delete RSS Feed            | Delete an RSS feed and its items.                                                         | ✅ Implemented      |
+| Search Items               | Search items using vector search for similar content.                                     | ✅ Implemented      |
+| Handle Podcasts            | Save audio information for podcasts, including playback position.                         | ✅ Implemented      |
+| Category                   | Add category to feeds.                                                                    | ✅ Implemented      |
+| Audio Playback (UI)        | Play podcasts directly in the UI and save playback position.                              | ✅ Implemented      |
+| Search Bar (UI)            | Search for items with real-time suggestions.                                              | ✅ Implemented      |
+| Infinite Scroll (UI)       | Infinite scroll for loading more items.                                                   | ✅ Implemented      |
+| Dark Mode (UI)             | Modern UI with a dark theme.                                                              | ✅ Implemented      |
+| AI Content Analysis        | Use AI to analyze new articles.                                                           | ❌ Not Implemented  |
+| Automated AI Notifications | Automatically send notifications when triggers apply. (The trigger is a prompt to the AI) | ❌ Not Implemented  |
+| Users                      | Google auth                                                                               | ❌ Not Implemented  |
+| Save items                 |                                                                                           | ❌ Not Implemented  |
+| History                    |                                                                                           | ❌ Not Implemented  |
+| Main feed                  |                                                                                           | 🛠️ Working on it  |
+| TTS                        | text to speech with OpenAI whisper                                                        | ❌ Not Implemented  |
 
 ## Future Plan
 

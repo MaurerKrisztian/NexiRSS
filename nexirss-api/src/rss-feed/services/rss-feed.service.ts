@@ -29,9 +29,20 @@ export class RssFeedService {
       if (!feed) {
         const feedData = await this.parser.parseURL(url);
         console.log(JSON.stringify(feedData, null, 2));
+
+        const getImage = (rss) => {
+          if (feedData.image !== undefined) {
+            return typeof feedData.image == 'string'
+              ? feedData.image
+              : feedData.image?.url;
+          }
+          return feedData.image || feedData?.itunes?.image;
+        };
         feed = new this.feedModel({
           url,
           title: feedData.title,
+          description: feedData.description,
+          image: getImage(feedData),
           category,
         });
         await feed.save();
