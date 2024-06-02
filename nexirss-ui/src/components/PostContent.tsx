@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Typography, IconButton, Paper } from '@mui/material';
+import { Box, Typography, IconButton, Paper, Button } from '@mui/material';
 import axios from 'axios';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
@@ -17,6 +17,7 @@ interface Post {
     pubDate: string;
     content: string;
     audioInfo?: AudioInfo;
+    ttsAudioId?: string;
 }
 
 const PostContent: React.FC = () => {
@@ -24,6 +25,7 @@ const PostContent: React.FC = () => {
     const [post, setPost] = useState<Post | null>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const [audioPosition, setAudioPosition] = useState<number>(0);
+    const [generatingTTS, setGeneratingTTS] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchPost = async () => {
@@ -54,6 +56,18 @@ const PostContent: React.FC = () => {
         }
     };
 
+    const handleGenerateTTS = async () => {
+        setGeneratingTTS(true);
+        try {
+            const response = await axios.post(`http://localhost:3000/tts/generate`, { postId });
+            console.log("got file id ", response.data.ttsAudioId, response.data)
+            setPost(prevPost => prevPost ? { ...prevPost, ttsAudioId: response.data.ttsAudioId } : null);
+        } catch (error) {
+            console.error('Error generating TTS:', error);
+        }
+        setGeneratingTTS(false);
+    };
+
     if (!post) {
         return <Typography>Loading...</Typography>;
     }
@@ -81,6 +95,19 @@ const PostContent: React.FC = () => {
                         <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
                             Audio length: {Math.floor(Number(post.audioInfo.length) / 60)} minutes
                         </Typography>
+                    </Box>
+                )}
+                {!post.ttsAudioId && (
+                    <Button variant="contained" color="primary" onClick={handleGenerateTTS} disabled={generatingTTS}>
+                        {generatingTTS ? 'Generating TTS...' : 'Generate TTS'}
+                    </Button>
+                )}
+                {post.ttsAudioId && (
+                    <Box sx={{ mt: 2 }}>
+                        <audio controls style={{ width: '100%' }}>
+                            <source src={`http://localhost:3000/tts/${post.ttsAudioId}`} type="audio/mpeg" />
+                            Your browser does not support the audio element.
+                        </audio>
                     </Box>
                 )}
                 <Typography variant="body1" gutterBottom>

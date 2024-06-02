@@ -28,6 +28,7 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/mongoose": "^10.0.6",
     "@nestjs/platform-express": "^8.0.0",
+    "mongodb": "^6.3.0",
     "mongoose": "^8.4.1",
     "openai": "^4.47.3",
     "reflect-metadata": "^0.1.13",
