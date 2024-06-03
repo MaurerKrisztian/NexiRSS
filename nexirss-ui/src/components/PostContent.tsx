@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import { Box, Typography, IconButton, Paper, Button } from '@mui/material';
 import axios from 'axios';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/atom-one-dark-reasonable.css';
 
 interface AudioInfo {
     length: string;
@@ -49,6 +51,18 @@ const PostContent: React.FC = () => {
             audioRef.current.currentTime = audioPosition;
         }
     }, [audioPosition]);
+
+    useEffect(() => {
+        if (post && post.content) {
+            document.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightBlock(block as HTMLElement);
+            });
+            document.querySelectorAll('img').forEach((img) => {
+                img.style.maxWidth = '100%';
+                img.style.height = 'auto';
+            });
+        }
+    }, [post]);
 
     const handleTimeUpdate = () => {
         if (audioRef.current) {
@@ -133,14 +147,14 @@ const PostContent: React.FC = () => {
                             </iframe>
                         </div>
                     )}
-                    <div dangerouslySetInnerHTML={{__html: post.content}}/>
+                    <div dangerouslySetInnerHTML={{ __html: post.content }} />
                 </Typography>
                 <IconButton
                     color="primary"
                     onClick={() => window.open(post.link, '_blank')}
-                    sx={{float: 'right'}}
+                    sx={{ float: 'right' }}
                 >
-                    <OpenInNewIcon/>
+                    <OpenInNewIcon />
                 </IconButton>
             </Paper>
         </Box>

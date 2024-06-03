@@ -16,6 +16,8 @@ const FeedForm: React.FC = () => {
     const [url, setUrl] = useState('');
     const [category, setCategory] = useState('');
     const [feedType, setFeedType] = useState('rss');
+    const [mediumType, setMediumType] = useState('profile');
+    const [mediumValue, setMediumValue] = useState('');
     const [maxItems, setMaxItems] = useState(3);
     const [feeds, setFeeds] = useState<Feed[]>([]);
     const navigate = useNavigate();
@@ -40,6 +42,16 @@ const FeedForm: React.FC = () => {
             finalUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${url}`;
         } else if (feedType === 'devto') {
             finalUrl = `https://dev.to/feed/${url}`;
+        } else if (feedType === 'medium') {
+            if (mediumType === 'profile') {
+                finalUrl = `https://medium.com/feed/${mediumValue}`;
+            } else if (mediumType === 'publication') {
+                finalUrl = `https://medium.com/feed/${mediumValue}`;
+            } else if (mediumType === 'tag') {
+                finalUrl = `https://medium.com/feed/tag/${mediumValue}`;
+            } else if (mediumType === 'publication-tag') {
+                finalUrl = `https://medium.com/feed/${mediumValue.split(':')[0]}/tagged/${mediumValue.split(':')[1]}`;
+            }
         }
 
         try {
@@ -47,6 +59,8 @@ const FeedForm: React.FC = () => {
             setUrl('');
             setCategory('');
             setFeedType('rss');
+            setMediumType('profile');
+            setMediumValue('');
             setMaxItems(3);
             const response = await axios.get('http://localhost:3000/rss-feed/feeds');
             setFeeds(response.data);
@@ -88,14 +102,45 @@ const FeedForm: React.FC = () => {
                         <MenuItem value="rss">RSS</MenuItem>
                         <MenuItem value="youtube">YouTube</MenuItem>
                         <MenuItem value="devto">Dev.to</MenuItem>
+                        <MenuItem value="medium">Medium.com</MenuItem>
                     </TextField>
+                    {feedType === 'medium' && (
+                        <TextField
+                            select
+                            label="Medium Feed Type"
+                            variant="outlined"
+                            fullWidth
+                            margin="normal"
+                            value={mediumType}
+                            onChange={(e) => setMediumType(e.target.value)}
+                        >
+                            <MenuItem value="profile">Profile</MenuItem>
+                            <MenuItem value="publication">Publication</MenuItem>
+                            <MenuItem value="tag">Tag</MenuItem>
+                            <MenuItem value="publication-tag">Publication-Tag</MenuItem>
+                        </TextField>
+                    )}
                     <TextField
-                        label={feedType === 'youtube' ? 'YouTube Channel ID' : feedType === 'devto' ? 'Dev.to Profile Name' : 'Feed URL'}
+                        label={
+                            feedType === 'youtube'
+                                ? 'YouTube Channel ID'
+                                : feedType === 'devto'
+                                    ? 'Dev.to Profile Name'
+                                    : feedType === 'medium'
+                                        ? mediumType === 'profile' || mediumType === 'publication'
+                                            ? 'Medium Username or Publication Name'
+                                            : mediumType === 'tag'
+                                                ? 'Medium Tag Name'
+                                                : mediumType === 'publication-tag'
+                                                    ? 'Medium Publication Name:Tag Name'
+                                                    : 'Feed URL'
+                                        : 'Feed URL'
+                        }
                         variant="outlined"
                         fullWidth
                         margin="normal"
-                        value={url}
-                        onChange={(e) => setUrl(e.target.value)}
+                        value={feedType === 'medium' ? mediumValue : url}
+                        onChange={(e) => feedType === 'medium' ? setMediumValue(e.target.value) : setUrl(e.target.value)}
                     />
                     <TextField
                         label="Category"
