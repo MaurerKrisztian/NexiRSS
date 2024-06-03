@@ -26,6 +26,11 @@ export class RssFeedController {
     );
   }
 
+  @Post('fetch-all')
+  async fetchAllRssFeed() {
+    return this.rssFeedService.fetchAndSaveAllRss();
+  }
+
   @Post('vector-search')
   async vectorSearch(@Body('query') query: string): Promise<RssItem[]> {
     return this.rssFeedService.vectorSearch(query);

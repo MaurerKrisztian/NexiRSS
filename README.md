@@ -26,7 +26,7 @@ NexiRSS is an  RSS feed aggregator. It allows you to manage RSS feeds, including
 | Save items                 |                                                                                           | ❌ Not Implemented  |
 | History                    |                                                                                           | ❌ Not Implemented  |
 | Main feed                  |                                                                                           | 🛠️ Working on it  |
-| TTS                        | text to speech with OpenAI whisper                                                        | ❌ Not Implemented  |
+| TTS                        | text to speech with OpenAI                                                                | 🛠️ Working on it   |
 
 ## Future Plan
 
@@ -58,7 +58,7 @@ NexiRSS is an  RSS feed aggregator. It allows you to manage RSS feeds, including
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/NexiRSS.git
+   git clone https://github.com/MaurerKrisztian/NexiRSS.git
    cd NexiRSS
    ```
 2. Install dependencies for the API:

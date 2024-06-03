@@ -21,7 +21,7 @@ export class RssFeedService {
 
   async fetchAndSaveRss(
     url: string,
-    category: string,
+    category?: string,
     maxItems = 3,
   ): Promise<{ newItems: number; totalItems: number }> {
     try {
@@ -48,12 +48,14 @@ export class RssFeedService {
         await feed.save();
       } else {
         // Update the category if the feed already exists
-        feed.category = category;
+        if (category) {
+          feed.category = category;
+        }
         await feed.save();
       }
 
       const feedData = await this.parser.parseURL(url);
-      console.log(JSON.stringify(feedData, null, 2));
+      // console.log(JSON.stringify(feedData, null, 2));
       let newItems = 0;
 
       const processData = feedData.items.slice(0, maxItems);
@@ -97,26 +99,46 @@ export class RssFeedService {
     }
   }
 
+  async fetchAndSaveAllRss() {
+    const feeds: Feed[] = await this.feedModel.find().exec();
+    // const urls = feeds.map((feed) => feed.url);
+    const fetchResults = await Promise.all(
+      feeds.map(async (feed) => {
+        return { update: await this.fetchAndSaveRss(feed.url), feed };
+      }),
+    );
+    return fetchResults;
+  }
+
   async getAllFeeds(): Promise<Feed[]> {
     return this.feedModel.find().exec();
   }
 
   async getFeedItems(feedId: string): Promise<RssItem[]> {
-    return this.rssItemModel.find({ feed: feedId }).populate('feed').exec();
+    return this.rssItemModel
+      .find({ feed: feedId }, { plot_embedding: 0 })
+      .populate('feed')
+      .exec();
   }
 
   async getItemById(id: string): Promise<RssItem> {
-    return this.rssItemModel.findById(id).populate('feed').exec();
+    return this.rssItemModel
+      .findById(id, { plot_embedding: 0 })
+      .populate('feed')
+      .exec();
   }
 
   async getAllFeedItemsOrderedByDate(): Promise<RssItem[]> {
-    return this.rssItemModel.find().sort({ pubDate: -1 }).exec();
+    return this.rssItemModel
+      .find({}, { plot_embedding: 0 })
+      .sort({ pubDate: -1 })
+      .exec();
   }
 
   async getItems(page: number, limit: number): Promise<RssItem[]> {
     const skip = (page - 1) * limit;
     return this.rssItemModel
-      .find()
+      .find({}, { plot_embedding: 0 })
       .sort({ pubDate: -1 })
       .skip(skip)
       .limit(limit)
@@ -128,7 +150,7 @@ export class RssFeedService {
     const feeds = await this.feedModel.find({ category }).exec();
     const feedIds = feeds.map((feed) => feed._id);
     return this.rssItemModel
-      .find({ feed: { $in: feedIds } })
+      .find({ feed: { $in: feedIds } }, { plot_embedding: 0 })
       .sort({ pubDate: -1 })
       .populate('feed')
       .exec();

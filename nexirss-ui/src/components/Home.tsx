@@ -4,6 +4,7 @@ import axios from 'axios';
 import FeedItemPreview from './FeedItemPreview';
 import SubscribedFeeds from './SubscribedFeeds';
 import CategoriesList from './CategoriesList';
+import RefetchButton from "./RefetchButton";
 
 interface Feed {
     _id: string;
@@ -90,7 +91,7 @@ const Home: React.FC = () => {
             <CategoriesList categories={categories} />
             <Divider sx={{ my: 2 }} />
             <Typography variant="h4" gutterBottom>
-                New items
+                New items <RefetchButton></RefetchButton>
             </Typography>
             <List>
                 {items.map(item => (

@@ -30,7 +30,7 @@ export class RssItem extends Document {
   @Prop({ required: true })
   pubDate: Date;
 
-  @Prop({ required: true })
+  @Prop({ required: false, default: '' })
   content: string;
 
   @Prop({ type: AudioInfoSchema, required: false })

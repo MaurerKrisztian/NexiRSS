@@ -68,6 +68,16 @@ const PostContent: React.FC = () => {
         setGeneratingTTS(false);
     };
 
+    const isYouTubeLink = (url: string) => {
+        const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/;
+        return youtubeRegex.test(url);
+    };
+
+    const getYouTubeEmbedUrl = (url: string) => {
+        const videoIdMatch = url.match(/(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/\w+\/\w+\/|\/v\/|^https?:\/\/youtu\.be\/|^https?:\/\/www.youtube.com\/watch\?v=))([\w-]{11})(?:\S+)?$/);
+        return videoIdMatch ? `https://www.youtube.com/embed/${videoIdMatch[1]}` : null;
+    };
+
     if (!post) {
         return <Typography>Loading...</Typography>;
     }
@@ -97,7 +107,7 @@ const PostContent: React.FC = () => {
                         </Typography>
                     </Box>
                 )}
-                {!post.ttsAudioId && (
+                {!post.ttsAudioId && post.content && (
                     <Button variant="contained" color="primary" onClick={handleGenerateTTS} disabled={generatingTTS}>
                         {generatingTTS ? 'Generating TTS...' : 'Generate TTS'}
                     </Button>
@@ -111,14 +121,26 @@ const PostContent: React.FC = () => {
                     </Box>
                 )}
                 <Typography variant="body1" gutterBottom>
-                    <div dangerouslySetInnerHTML={{ __html: post.content }} />
+                    {isYouTubeLink(post.link) && (
+                        <div>
+                            <iframe
+                                width="560"
+                                height="315"
+                                src={getYouTubeEmbedUrl(post.link)}
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen>
+                            </iframe>
+                        </div>
+                    )}
+                    <div dangerouslySetInnerHTML={{__html: post.content}}/>
                 </Typography>
                 <IconButton
                     color="primary"
                     onClick={() => window.open(post.link, '_blank')}
-                    sx={{ float: 'right' }}
+                    sx={{float: 'right'}}
                 >
-                    <OpenInNewIcon />
+                    <OpenInNewIcon/>
                 </IconButton>
             </Paper>
         </Box>
