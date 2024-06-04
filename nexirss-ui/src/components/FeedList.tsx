@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Card, CardActionArea, CardContent, CardMedia, Grid } from '@mui/material';
+import { Box, Typography, Card, CardContent, CardMedia, Grid } from '@mui/material';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 interface Feed {
@@ -43,7 +44,7 @@ const FeedListPage: React.FC = () => {
                 {feeds.map((feed) => (
                     <Grid item key={feed._id} xs={12} sm={6} md={4}>
                         <Card>
-                            <CardActionArea href={`http://localhost:3001/feeds/${feed._id}/items`}>
+                            <Link to={`/feeds/${feed._id}/items`} style={{ textDecoration: 'none' }}>
                                 <CardMedia
                                     component="img"
                                     alt={feed.title}
@@ -56,7 +57,7 @@ const FeedListPage: React.FC = () => {
                                         {feed.title}
                                     </Typography>
                                 </CardContent>
-                            </CardActionArea>
+                            </Link>
                         </Card>
                     </Grid>
                 ))}
