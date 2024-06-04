@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, Typography, IconButton, Paper, Button } from '@mui/material';
 import axios from 'axios';
@@ -31,7 +31,9 @@ interface Post {
 const PostContent: React.FC = () => {
     const { postId } = useParams<{ postId: string }>();
     const [post, setPost] = useState<Post | null>(null);
-    const { playAudio } = useAudio();
+    const { playAudio, setAudioPosition } = useAudio();
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+    const [audioPosition, setAudioPositionState] = useState<number>(0);
     const [generatingTTS, setGeneratingTTS] = useState<boolean>(false);
 
     useEffect(() => {
@@ -39,6 +41,10 @@ const PostContent: React.FC = () => {
             try {
                 const response = await axios.get(`http://localhost:3000/rss-feed/items/${postId}`);
                 setPost(response.data);
+                const savedPosition = localStorage.getItem(`audioPosition-${postId}`);
+                if (savedPosition) {
+                    setAudioPositionState(Number(savedPosition));
+                }
             } catch (error) {
                 console.error('Error fetching post:', error);
             }
@@ -46,6 +52,12 @@ const PostContent: React.FC = () => {
 
         fetchPost();
     }, [postId]);
+
+    useEffect(() => {
+        if (audioRef.current) {
+            audioRef.current.currentTime = audioPosition;
+        }
+    }, [audioPosition]);
 
     useEffect(() => {
         if (post && post.content) {
@@ -58,6 +70,12 @@ const PostContent: React.FC = () => {
             });
         }
     }, [post]);
+
+    const handleTimeUpdate = () => {
+        if (audioRef.current) {
+            localStorage.setItem(`audioPosition-${postId}`, audioRef.current.currentTime.toString());
+        }
+    };
 
     const handleGenerateTTS = async () => {
         setGeneratingTTS(true);
@@ -95,12 +113,17 @@ const PostContent: React.FC = () => {
                 </Typography>
                 {post.audioInfo && (
                     <Box sx={{ mt: 2 }}>
-                        <Button onClick={() => playAudio(post.audioInfo.url, post.title, post.feed?.title || 'Unknown Feed', post.feed?.image || '', post._id)}>
+                        <Button onClick={() => playAudio(post.audioInfo.url, post.title, post.feed?.title || 'Unknown Feed', post.feed?.image || '', post._id, audioPosition)}>
                             Play Audio
                         </Button>
                         <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
                             Audio length: {Math.floor(Number(post.audioInfo.length) / 60)} minutes
                         </Typography>
+                        <audio
+                            ref={audioRef}
+                            onTimeUpdate={handleTimeUpdate}
+                            style={{ display: 'none' }}
+                        />
                     </Box>
                 )}
                 {!post.ttsAudioId && post.content && (
@@ -110,7 +133,7 @@ const PostContent: React.FC = () => {
                 )}
                 {post.ttsAudioId && (
                     <Box sx={{ mt: 2 }}>
-                        <Button onClick={() => playAudio(`http://localhost:3000/tts/${post.ttsAudioId}`, post.title, post.feed?.title || 'Unknown Feed', post.feed?.image || '', post._id)}>
+                        <Button onClick={() => playAudio(`http://localhost:3000/tts/${post.ttsAudioId}`, post.title, post.feed?.title || 'Unknown Feed', post.feed?.image || '', post._id, audioPosition)}>
                             Play TTS Audio
                         </Button>
                     </Box>

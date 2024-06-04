@@ -5,7 +5,13 @@ import { Link } from 'react-router-dom';
 import { useAudio } from './AudioContext';
 
 const MediaPlayer: React.FC = () => {
-    const { audioUrl, audioRef, itemTitle, feedTitle, imageUrl, postId, stopAudio } = useAudio();
+    const { audioUrl, audioRef, itemTitle, feedTitle, imageUrl, postId, stopAudio, setAudioPosition } = useAudio();
+
+    const handleTimeUpdate = () => {
+        if (audioRef.current && postId) {
+            localStorage.setItem(`audioPosition-${postId}`, audioRef.current.currentTime.toString());
+        }
+    };
 
     if (!audioUrl) return null;
 
@@ -25,7 +31,12 @@ const MediaPlayer: React.FC = () => {
                     </Typography>
                 )}
                 <Typography variant="body2" color="textSecondary">{feedTitle}</Typography>
-                <audio controls style={{ width: '100%', backgroundColor: 'transparent', color: 'black' }} ref={audioRef}>
+                <audio
+                    controls
+                    style={{ width: '100%', backgroundColor: 'transparent', color: 'black' }}
+                    ref={audioRef}
+                    onTimeUpdate={handleTimeUpdate}
+                >
                     <source src={audioUrl} type="audio/mpeg" />
                     Your browser does not support the audio element.
                 </audio>
