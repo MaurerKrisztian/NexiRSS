@@ -27,6 +27,9 @@ export class RssItem extends Document {
   @Prop({ required: true })
   link: string;
 
+  @Prop({ required: false })
+  image: string;
+
   @Prop({ required: true })
   pubDate: Date;
 
@@ -65,22 +68,23 @@ export const fetchEmbedding = async (text: string): Promise<number[]> => {
 };
 
 RssItemSchema.pre<RssItem>('save', async function (next) {
-  const rssItem = this as RssItem;
-  const text = `${rssItem.title} ${rssItem.content} ${rssItem.pubDate}`;
-  rssItem.plot_embedding = await fetchEmbedding(text);
+  // const rssItem = this as RssItem;
+  // const text = `${rssItem.title} ${rssItem.content} ${rssItem.pubDate}`;
+  // rssItem.plot_embedding = await fetchEmbedding(text);
+  // todo: fix this error: RssFeedService 400 This model's maximum context length is 8192 tokens, however you requested 17035 tokens (17035 in your prompt; 0 for the completion). Please reduce your prompt; or completion length.
   next();
 });
 
 RssItemSchema.pre('findOneAndUpdate', async function (next) {
-  const update = this.getUpdate() as RssItem;
-  if (update.title || update.content || update.pubDate) {
-    const rssItem = await this.model.findOne(this.getQuery()).exec();
-    if (rssItem) {
-      const text = `${update.title || rssItem.title} ${
-        update.content || rssItem.content
-      } ${update.pubDate || rssItem.pubDate}`;
-      update.plot_embedding = await fetchEmbedding(text);
-    }
-  }
+  // const update = this.getUpdate() as RssItem;
+  // if (update.title || update.content || update.pubDate) {
+  //   const rssItem = await this.model.findOne(this.getQuery()).exec();
+  //   if (rssItem) {
+  //     const text = `${update.title || rssItem.title} ${
+  //       update.content || rssItem.content
+  //     } ${update.pubDate || rssItem.pubDate}`;
+  //     update.plot_embedding = await fetchEmbedding(text);
+  //   }
+  // }
   next();
 });

@@ -3,6 +3,11 @@ import { Link as RouterLink } from 'react-router-dom';
 import { ListItem, ListItemText, IconButton, Avatar, Box } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import PodcastIcon from '@mui/icons-material/Mic';
+import TimeAgo from 'javascript-time-ago'
+import en from 'javascript-time-ago/locale/en'
+
+TimeAgo.addDefaultLocale(en)
+const timeAgo = new TimeAgo("en")
 
 interface AudioInfo {
     length?: number;
@@ -17,7 +22,8 @@ interface FeedItem {
     pubDate: string;
     content: string;
     audioInfo?: AudioInfo;
-    feed?: {image?: string}
+    image?: string;
+    feed?: {image?: string, title?: string}
 }
 
 interface FeedItemPreviewProps {
@@ -45,7 +51,7 @@ const FeedItemPreview: React.FC<FeedItemPreviewProps> = ({ item }) => {
         <ListItem component={RouterLink} to={`/items/${item._id}`} button>
             <Avatar
                 variant="square"
-                src={item?.feed?.image || placeholderImage}
+                src={item.image || item?.feed?.image || placeholderImage}
                 alt={item.title}
                 sx={{ width: 56, height: 56, marginRight: 2 }}
             />
@@ -53,7 +59,7 @@ const FeedItemPreview: React.FC<FeedItemPreviewProps> = ({ item }) => {
                 primary={item.title}
                 secondary={
                     <>
-                        {new Date(item.pubDate).toLocaleString()}
+                        <i> {item.feed.title} </i>  - {timeAgo.format(new Date(item.pubDate))}
                         {item.audioInfo && (
                             <>
                                 <br />

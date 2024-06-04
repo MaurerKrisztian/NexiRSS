@@ -5,6 +5,7 @@ import axios from 'axios';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark-reasonable.css';
+import dateFormat, { masks } from "dateformat";
 
 interface AudioInfo {
     length: string;
@@ -103,7 +104,7 @@ const PostContent: React.FC = () => {
                     {post.title}
                 </Typography>
                 <Typography variant="body2" color="textSecondary" gutterBottom>
-                    {new Date(post.pubDate).toLocaleString()}
+                        { dateFormat(new Date(post.pubDate), "dddd, mmmm dS, yyyy, h:MM:ss TT")}
                 </Typography>
                 {post.audioInfo && (
                     <Box sx={{ mt: 2 }}>

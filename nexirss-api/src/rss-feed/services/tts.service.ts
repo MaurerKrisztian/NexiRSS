@@ -39,6 +39,19 @@ export class TTSService {
     return str;
   }
 
+  sanitizeString(input: string): string {
+    // Remove <code> blocks
+    input = input.replace(/<code[\s\S]*?<\/code>/gi, '');
+
+    // Remove all HTML tags
+    input = input.replace(/<\/?[^>]+(>|$)/g, '');
+
+    // Remove URLs
+    input = input.replace(/https?:\/\/[^\s]+/g, '');
+
+    return input;
+  }
+
   async generateTTS(postId: string) {
     const post: RssItem = await this.rssItemModel.findById(postId).exec();
     if (!post) {
@@ -49,7 +62,7 @@ export class TTSService {
     const ttsResponse = await this.openai.audio.speech.create({
       model: 'tts-1',
       voice: 'alloy',
-      input: this.truncateString(1000, post.content), // todo: max characters is 4000, remove images and tags etc
+      input: this.truncateString(4000, this.sanitizeString(post.content)), // todo: max characters is 4000, remove images and tags etc
       response_format: 'mp3',
     });
 

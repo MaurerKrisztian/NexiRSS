@@ -16,7 +16,7 @@ export class RssFeedService {
     @InjectModel(Feed.name) private readonly feedModel: Model<Feed>,
     private readonly eventEmitter: EventEmitter2,
   ) {
-    this.parser = new Parser();
+    this.parser = new Parser({ customFields: { item: ['media:group'] } });
   }
 
   async fetchAndSaveRss(
@@ -75,12 +75,16 @@ export class RssFeedService {
           const rssItem = new this.rssItemModel({
             title: item.title,
             link: item.link,
+            image:
+              item.image ||
+              item?.['media:group']?.['media:thumbnail'][0]?.['$']?.url,
             pubDate: new Date(item.pubDate),
             content:
               item['content:encoded'] ||
               item.content ||
               item.description ||
-              item.contentSnippet,
+              item.contentSnippet ||
+              item?.['media:group']?.['media:description'][0],
             feed: feed._id,
             audioInfo,
           });
