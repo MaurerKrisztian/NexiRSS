@@ -44,7 +44,7 @@ const FeedListPage: React.FC = () => {
                 {feeds.map((feed) => (
                     <Grid item key={feed._id} xs={12} sm={6} md={4}>
                         <Card>
-                            <Link to={`/feeds/${feed._id}/items`} style={{ textDecoration: 'none' }}>
+                            <Link to={`/feeds/${feed._id}/items`} style={{ textDecoration: 'none', color: '#90caf9' }}>
                                 <CardMedia
                                     component="img"
                                     alt={feed.title}
