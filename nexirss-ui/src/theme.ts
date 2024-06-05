@@ -19,6 +19,19 @@ const theme = createTheme({
                 },
             },
         },
+        MuiLink: {
+            styleOverrides: {
+                root: {
+                    color: '#90caf9', // Default link color
+                    '&:hover': {
+                        color: '#19df0a', // Link color on hover
+                    },
+                    '&:visited': {
+                        color: '#454747', // Link color for visited links
+                    },
+                },
+            },
+        },
     },
 });
 

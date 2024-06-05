@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import {List, Typography, CircularProgress, Box, Paper, CardMedia, Divider} from '@mui/material';
 import axios from 'axios';
 import FeedItemPreview from './FeedItemPreview';
+import {API_URL} from "../api-client/api";
 
 interface AudioInfo {
     length?: number;
@@ -36,10 +37,10 @@ const FeedItemsByFeedId: React.FC = () => {
     useEffect(() => {
         const fetchFeedDetails = async () => {
             try {
-                const feedResponse = await axios.get(`http://localhost:3000/rss-feed/feeds/${feedId}`);
+                const feedResponse = await axios.get(`${API_URL}/rss-feed/feeds/${feedId}`);
                 setFeed(feedResponse.data);
 
-                const itemsResponse = await axios.get(`http://localhost:3000/rss-feed/feeds/${feedId}/items`);
+                const itemsResponse = await axios.get(`${API_URL}/rss-feed/feeds/${feedId}/items`);
                 const itemsWithAudioLength = await Promise.all(
                     itemsResponse.data.map(async (item: FeedItem) => {
                         if (item.audioInfo && !item.audioInfo.length) {

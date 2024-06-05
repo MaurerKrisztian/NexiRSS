@@ -1,0 +1,1 @@
+export const API_URL = "https://nexirss-production.up.railway.app"

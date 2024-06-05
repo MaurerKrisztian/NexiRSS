@@ -7,6 +7,7 @@ import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark-reasonable.css';
 import dateFormat from 'dateformat';
 import { useAudio } from './AudioContext';
+import {API_URL} from "../api-client/api";
 
 interface AudioInfo {
     length: string;
@@ -39,7 +40,7 @@ const PostContent: React.FC = () => {
     useEffect(() => {
         const fetchPost = async () => {
             try {
-                const response = await axios.get(`http://localhost:3000/rss-feed/items/${postId}`);
+                const response = await axios.get(`${API_URL}/rss-feed/items/${postId}`);
                 setPost(response.data);
                 const savedPosition = localStorage.getItem(`audioPosition-${postId}`);
                 if (savedPosition) {
@@ -80,7 +81,7 @@ const PostContent: React.FC = () => {
     const handleGenerateTTS = async () => {
         setGeneratingTTS(true);
         try {
-            const response = await axios.post(`http://localhost:3000/tts/generate`, { postId });
+            const response = await axios.post(`${API_URL}/tts/generate`, { postId });
             setPost(prevPost => prevPost ? { ...prevPost, ttsAudioId: response.data.ttsAudioId } : null);
         } catch (error) {
             console.error('Error generating TTS:', error);
@@ -133,7 +134,7 @@ const PostContent: React.FC = () => {
                 )}
                 {post.ttsAudioId && (
                     <Box sx={{ mt: 2 }}>
-                        <Button onClick={() => playAudio(`http://localhost:3000/tts/${post.ttsAudioId}`, post.title, post.feed?.title || 'Unknown Feed', post.feed?.image || '', post._id, audioPosition)}>
+                        <Button onClick={() => playAudio(`${API_URL}/tts/${post.ttsAudioId}`, post.title, post.feed?.title || 'Unknown Feed', post.feed?.image || '', post._id, audioPosition)}>
                             Play TTS Audio
                         </Button>
                     </Box>

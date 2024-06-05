@@ -4,6 +4,7 @@ import { TextField, Box, MenuItem, Select, CircularProgress, Typography, Popper,
 import axios from 'axios';
 import debounce from 'lodash/debounce';
 import { useNavigate } from 'react-router-dom';
+import {API_URL} from "../api-client/api";
 
 interface FeedItem {
     _id: string;
@@ -34,7 +35,7 @@ const SearchBar: React.FC = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/rss-feed/feeds');
+                const response = await axios.get(`${API_URL}/rss-feed/feeds`);
                 const feeds = response.data;
                 const uniqueCategories: string[] = Array.from(new Set(feeds.map((feed: any) => feed.category)));
                 setCategories(uniqueCategories.map((cat, index) => ({ _id: index.toString(), name: cat })));
@@ -54,7 +55,7 @@ const SearchBar: React.FC = () => {
 
         setLoading(true);
         try {
-            const response = await axios.post('http://localhost:3000/rss-feed/vector-search', { query: searchQuery, category });
+            const response = await axios.post(`${API_URL}/rss-feed/vector-search`, { query: searchQuery, category });
             setSuggestions(response.data);
         } catch (error) {
             console.error('Error fetching search results:', error);

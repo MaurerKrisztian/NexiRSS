@@ -5,6 +5,7 @@ import FeedItemPreview from './FeedItemPreview';
 import SubscribedFeeds from './SubscribedFeeds';
 import CategoriesList from './CategoriesList';
 import RefetchButton from "./RefetchButton";
+import {API_URL} from "../api-client/api";
 
 interface Feed {
     _id: string;
@@ -40,7 +41,7 @@ const Home: React.FC = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/rss-feed/feeds');
+                const response = await axios.get(`${API_URL}/rss-feed/feeds`);
                 const feeds: Feed[] = response.data;
                 const uniqueCategories = Array.from(new Set(feeds.map(feed => feed.category))).filter(e => e !== undefined);
                 setCategories(uniqueCategories);
@@ -55,7 +56,7 @@ const Home: React.FC = () => {
 
     const fetchItems = useCallback(async (page: number) => {
         try {
-            const response = await axios.get(`http://localhost:3000/rss-feed/items?page=${page}&limit=10`);
+            const response = await axios.get(`${API_URL}/rss-feed/items?page=${page}&limit=10`);
             const newItems: FeedItem[] = response.data;
             setItems(prevItems => [...prevItems, ...newItems]);
             if (newItems.length === 0) {

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, Card, CardContent, CardMedia, Grid } from '@mui/material';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import {API_URL} from "../api-client/api";
 
 interface Feed {
     _id: string;
@@ -20,7 +21,7 @@ const FeedListPage: React.FC = () => {
     useEffect(() => {
         const fetchFeeds = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/rss-feed/feeds');
+                const response = await axios.get(`${API_URL}/rss-feed/feeds`);
                 setFeeds(response.data);
                 setLoading(false);
             } catch (error) {
