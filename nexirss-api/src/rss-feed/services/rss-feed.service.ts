@@ -187,27 +187,48 @@ export class RssFeedService {
     return feed.save();
   }
 
-  async vectorSearch(query: string): Promise<RssItem[]> {
-    return this.rssItemModel
-      .aggregate([
-        {
-          $search: {
-            index: 'default',
-            text: {
-              query: query,
-              path: {
-                wildcard: '*',
-              },
+  async vectorSearch(query: string, category?: string): Promise<RssItem[]> {
+    const pipeline: any[] = [];
+
+    pipeline.push(
+      {
+        $search: {
+          index: 'default',
+          text: {
+            query: query,
+            path: {
+              wildcard: '*',
             },
           },
         },
-        {
-          $project: {
-            plot_embedding: 0,
-          },
+      },
+      {
+        $project: {
+          plot_embedding: 0,
         },
-      ])
-      .exec();
+      },
+      {
+        $lookup: {
+          from: 'feeds',
+          localField: 'feed',
+          foreignField: '_id',
+          as: 'feed',
+        },
+      },
+      {
+        $unwind: '$feed',
+      },
+    );
+
+    if (category && category !== 'all') {
+      pipeline.push({
+        $match: {
+          'feed.category': category,
+        },
+      });
+    }
+
+    return this.rssItemModel.aggregate(pipeline).exec();
   }
 
   getFeedById(feedId: string) {

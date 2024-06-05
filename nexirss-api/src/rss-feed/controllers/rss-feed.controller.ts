@@ -32,8 +32,11 @@ export class RssFeedController {
   }
 
   @Post('vector-search')
-  async vectorSearch(@Body('query') query: string): Promise<RssItem[]> {
-    return this.rssFeedService.vectorSearch(query);
+  async vectorSearch(
+    @Body('query') query: string,
+    @Body('category') category: string,
+  ): Promise<RssItem[]> {
+    return this.rssFeedService.vectorSearch(query, category);
   }
 
   @Get('feeds')
