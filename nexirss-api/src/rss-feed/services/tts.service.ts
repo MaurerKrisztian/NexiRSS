@@ -6,6 +6,7 @@ import { Readable, Stream } from 'stream';
 import { ObjectId } from 'bson';
 import OpenAI from 'openai';
 import { RssItem } from '../schemas/rss-item.schema';
+import process from 'node:process';
 export interface IGridFsFile {
   _id: ObjectId;
   length: number;
@@ -23,7 +24,7 @@ export class TTSService {
   constructor(
     @InjectModel('RssItem') private readonly rssItemModel: Model<RssItem>,
   ) {
-    const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/rss';
+    const uri = process.env.DB_URL || 'mongodb://localhost:27017/rss';
     const client = new MongoClient(uri);
     client.connect().then(() => {
       this.bucket = new GridFSBucket(client.db(), {
