@@ -2,6 +2,8 @@
 
 NexiRSS is an  RSS feed aggregator. It allows you to manage RSS feeds, including podcasts, track your progress on audio content, and includes a future plan to integrate AI triggers for notifications.
 
+### Try demo here: https://nexirss.netlify.app/ 
+
 ## Features
 
 | Feature                    | Description                                                                               | Status             |
