@@ -19,4 +19,11 @@ export class UserService {
       { $addToSet: { feeds: feedId } },
     );
   }
+
+  async removeFeedFromUser(userId: string, feedId: string) {
+    return this.userModel.updateOne(
+      { _id: userId },
+      { $pull: { feeds: feedId } },
+    );
+  }
 }

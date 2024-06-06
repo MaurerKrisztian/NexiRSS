@@ -1,9 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Box, Paper, IconButton, List, ListItem, ListItemText, ListItemSecondaryAction, MenuItem } from '@mui/material';
+import {
+    TextField,
+    Button,
+    Box,
+    Paper,
+    IconButton,
+    List,
+    ListItem,
+    ListItemText,
+    ListItemSecondaryAction,
+    MenuItem,
+    Typography
+} from '@mui/material';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import apiClient from "../api-client/api";
+import BrowsFeeds from "./BrowsFeeds";
 
 interface Feed {
     _id: string;
@@ -88,8 +101,13 @@ const FeedForm: React.FC = () => {
 
     return (
         <Box sx={{ mt: 2, mx: 'auto', maxWidth: 600, p: 2 }}>
+            <BrowsFeeds></BrowsFeeds>
+            <hr/>
             <Paper elevation={3} sx={{ p: 3 }}>
                 <Box component="form" onSubmit={handleSubmit}>
+                    <Typography variant="h5" gutterBottom>
+                        Add rss feed via link
+                    </Typography>
                     <TextField
                         select
                         label="Feed Type"

@@ -51,7 +51,7 @@ const FeedBrowser: React.FC = () => {
     };
 
     const handlePrevPage = () => {
-        setPage((prevPage) => Math.max(prevPage, 1));
+        setPage((prevPage) => Math.max(prevPage - 1, 1));
     };
 
     const handleNextPage = () => {
@@ -60,7 +60,7 @@ const FeedBrowser: React.FC = () => {
 
     return (
         <Box sx={{ mt: 2, mx: 'auto', maxWidth: 800, p: 2 }}>
-            <Typography variant="h4" gutterBottom>
+            <Typography variant="h5" gutterBottom>
                 Browse Feeds
             </Typography>
             <TextField
@@ -96,15 +96,17 @@ const FeedBrowser: React.FC = () => {
                             </Grid>
                         ))}
                     </Grid>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                        <Button variant="contained" onClick={handlePrevPage} disabled={page === 1}>
-                            Previous
-                        </Button>
-                        <Typography>Page {page} of {totalPages}</Typography>
-                        <Button variant="contained" onClick={handleNextPage} disabled={page === totalPages}>
-                            Next
-                        </Button>
-                    </Box>
+                    {searchTerm && (
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                            <Button variant="contained" onClick={handlePrevPage} disabled={page === 1}>
+                                Previous
+                            </Button>
+                            <Typography>Page {page} of {totalPages}</Typography>
+                            <Button variant="contained" onClick={handleNextPage} disabled={page === totalPages}>
+                                Next
+                            </Button>
+                        </Box>
+                    )}
                 </>
             )}
         </Box>

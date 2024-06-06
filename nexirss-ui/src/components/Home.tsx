@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { List, Typography, CircularProgress, Box, Divider } from '@mui/material';
+import { List, Typography, CircularProgress, Box, Divider, Alert } from '@mui/material';
 import FeedItemPreview from './FeedItemPreview';
 import SubscribedFeeds from './SubscribedFeeds';
 import RefetchButton from "./RefetchButton";
-import apiClient, {API_URL} from "../api-client/api";
-import BrowsFeeds from "./BrowsFeeds";
+import apiClient from "../api-client/api";
+import {Link} from "react-router-dom";
 
 interface Feed {
     _id: string;
@@ -25,13 +25,14 @@ interface FeedItem {
     content: string;
     audioInfo?: AudioInfo;
     feed?: {
-        image?: string
+        image?: string;
         title: string;
     };
 }
 
 const Home: React.FC = () => {
     const [categories, setCategories] = useState<string[]>([]);
+    const [feeds, setFeeds] = useState<Feed[]>([]);
     const [items, setItems] = useState<FeedItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -40,8 +41,9 @@ const Home: React.FC = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await apiClient.get(`/rss-feed/feeds`);
-                const feeds: Feed[] = response.data;
+                const response = await apiClient.get(`/rss-feed/user/feeds`);
+                const feeds: Feed[] = response.data || [];
+                setFeeds(feeds)
                 const uniqueCategories = Array.from(new Set(feeds.map(feed => feed.category))).filter(e => e !== undefined);
                 setCategories(uniqueCategories);
                 setLoading(false);
@@ -86,23 +88,36 @@ const Home: React.FC = () => {
     }
 
     return (
+
         <Box sx={{ mt: 2, mx: 'auto', maxWidth: 800, p: 2 }}>
-            <SubscribedFeeds />
-            <BrowsFeeds></BrowsFeeds>
-            {/*<CategoriesList categories={categories} />*/}
-            <Divider sx={{ my: 2 }} />
-            <Typography variant="h4" gutterBottom>
-                 <RefetchButton></RefetchButton>
-            </Typography>
-            <List>
-                {items.map(item => (
-                    <FeedItemPreview
-                        key={item._id}
-                        item={item}
-                    />
-                ))}
-            </List>
-            {loading && <CircularProgress />}
+            {feeds.length === 0 && (
+                <Alert severity="warning">
+                    No feed subscription. Please add a new feed in the <Link to={`/create`}> Feed Manager </Link> tab.
+                </Alert>
+            )}
+
+
+            {feeds.length > 0 && (
+               <div>
+                   <SubscribedFeeds />
+                   {/*<BrowsFeeds></BrowsFeeds>*/}
+                   {/*<CategoriesList categories={categories} />*/}
+                   <Divider sx={{ my: 2 }} />
+                   <Typography variant="h4" gutterBottom>
+                       <RefetchButton></RefetchButton>
+                   </Typography>
+                   <List>
+                       {items.map(item => (
+                           <FeedItemPreview
+                               key={item._id}
+                               item={item}
+                           />
+                       ))}
+                   </List>
+                   {loading && <CircularProgress />}
+               </div>
+            )}
+
         </Box>
     );
 };

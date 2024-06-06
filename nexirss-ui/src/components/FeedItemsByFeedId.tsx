@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import {List, Typography, CircularProgress, Box, Paper, CardMedia, Divider} from '@mui/material';
+import { List, Typography, CircularProgress, Box, Paper, CardMedia, Divider, Button } from '@mui/material';
 import FeedItemPreview from './FeedItemPreview';
 import apiClient from "../api-client/api";
 
@@ -32,6 +32,7 @@ const FeedItemsByFeedId: React.FC = () => {
     const [feed, setFeed] = useState<Feed | null>(null);
     const [items, setItems] = useState<FeedItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isSubscribed, setIsSubscribed] = useState(false);
 
     useEffect(() => {
         const fetchFeedDetails = async () => {
@@ -63,8 +64,37 @@ const FeedItemsByFeedId: React.FC = () => {
             }
         };
 
+        const checkSubscriptionStatus = async () => {
+            try {
+                const response = await apiClient.get(`/rss-feed/user/subscriptions`);
+                const subscribedFeeds = response.data;
+                setIsSubscribed(subscribedFeeds.includes(feedId));
+            } catch (error) {
+                console.error('Error checking subscription status:', error);
+            }
+        };
+
         fetchFeedDetails();
+        checkSubscriptionStatus();
     }, [feedId]);
+
+    const handleSubscribe = async () => {
+        try {
+            await apiClient.post('/rss-feed/user/add-feed', { feedId });
+            setIsSubscribed(true);
+        } catch (error) {
+            console.error('Error subscribing to feed:', error);
+        }
+    };
+
+    const handleUnsubscribe = async () => {
+        try {
+            await apiClient.delete('/rss-feed/user/remove-feed', { data: { feedId } });
+            setIsSubscribed(false);
+        } catch (error) {
+            console.error('Error unsubscribing from feed:', error);
+        }
+    };
 
     if (loading) {
         return <CircularProgress />;
@@ -88,6 +118,13 @@ const FeedItemsByFeedId: React.FC = () => {
                     <Typography variant="body1" gutterBottom>
                         {feed.description}
                     </Typography>
+                    <Button
+                        variant="contained"
+                        color={isSubscribed ? "secondary" : "primary"}
+                        onClick={isSubscribed ? handleUnsubscribe : handleSubscribe}
+                    >
+                        {isSubscribed ? "Unsubscribe" : "Subscribe"}
+                    </Button>
                     <Divider sx={{ my: 2 }} />
                 </>
             )}

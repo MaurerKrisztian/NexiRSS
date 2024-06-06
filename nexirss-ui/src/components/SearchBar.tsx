@@ -35,7 +35,7 @@ const SearchBar: React.FC = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await apiClient.get(`/rss-feed/feeds`);
+                const response = await apiClient.get(`/rss-feed/user/feeds`);
                 const feeds = response.data;
                 const uniqueCategories: string[] = Array.from(new Set(feeds.map((feed: any) => feed.category)));
                 setCategories(uniqueCategories.map((cat, index) => ({ _id: index.toString(), name: cat })));
