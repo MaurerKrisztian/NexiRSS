@@ -1,13 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Typography, IconButton, Paper, Button } from '@mui/material';
+import { Box, Typography, IconButton, Paper, Button, Alert } from '@mui/material';
 import axios from 'axios';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark-reasonable.css';
 import dateFormat from 'dateformat';
 import { useAudio } from './AudioContext';
-import {API_URL} from "../api-client/api";
+import apiClient, { API_URL } from '../api-client/api';
+import {IUser} from "./UserInfo";
 
 interface AudioInfo {
     length: string;
@@ -36,11 +37,12 @@ const PostContent: React.FC = () => {
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const [audioPosition, setAudioPositionState] = useState<number>(0);
     const [generatingTTS, setGeneratingTTS] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchPost = async () => {
             try {
-                const response = await axios.get(`${API_URL}/rss-feed/items/${postId}`);
+                const response = await apiClient.get(`/rss-feed/items/${postId}`);
                 setPost(response.data);
                 const savedPosition = localStorage.getItem(`audioPosition-${postId}`);
                 if (savedPosition) {
@@ -79,9 +81,17 @@ const PostContent: React.FC = () => {
     };
 
     const handleGenerateTTS = async () => {
+        const response = await apiClient.get('/auth/me');
+        const user: IUser = response.data;
+        if (!user.openaiApiKey) {
+            setErrorMessage('Please setup the OpenAI API key in the profile to use this feature.');
+            return;
+        }
+
         setGeneratingTTS(true);
+        setErrorMessage(null);
         try {
-            const response = await axios.post(`${API_URL}/tts/generate`, { postId });
+            const response = await apiClient.post(`/tts/generate`, { postId });
             setPost(prevPost => prevPost ? { ...prevPost, ttsAudioId: response.data.ttsAudioId } : null);
         } catch (error) {
             console.error('Error generating TTS:', error);
@@ -128,9 +138,12 @@ const PostContent: React.FC = () => {
                     </Box>
                 )}
                 {!post.ttsAudioId && post.content && (
-                    <Button variant="contained" color="primary" onClick={handleGenerateTTS} disabled={generatingTTS}>
-                        {generatingTTS ? 'Generating TTS...' : 'Generate TTS'}
-                    </Button>
+                    <Box sx={{ mt: 2 }}>
+                        {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+                        <Button variant="contained" color="primary" onClick={handleGenerateTTS} disabled={generatingTTS}>
+                            {generatingTTS ? 'Generating TTS...' : 'Generate TTS'}
+                        </Button>
+                    </Box>
                 )}
                 {post.ttsAudioId && (
                     <Box sx={{ mt: 2 }}>

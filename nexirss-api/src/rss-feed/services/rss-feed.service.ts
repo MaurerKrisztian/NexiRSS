@@ -5,6 +5,8 @@ import * as Parser from 'rss-parser';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { RssItem } from '../schemas/rss-item.schema';
 import { Feed } from '../schemas/feed.schema';
+import { User } from '../../user/models/user.schema';
+import { UserService } from '../../user/user.service';
 
 @Injectable()
 export class RssFeedService {
@@ -14,13 +16,16 @@ export class RssFeedService {
   constructor(
     @InjectModel(RssItem.name) private readonly rssItemModel: Model<RssItem>,
     @InjectModel(Feed.name) private readonly feedModel: Model<Feed>,
+    @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly eventEmitter: EventEmitter2,
+    private readonly userService: UserService,
   ) {
     this.parser = new Parser({ customFields: { item: ['media:group'] } });
   }
 
   async fetchAndSaveRss(
     url: string,
+    userId?: string,
     category?: string,
     maxItems = 3,
   ): Promise<{ newItems: number; totalItems: number }> {
@@ -45,7 +50,10 @@ export class RssFeedService {
           image: getImage(feedData),
           category,
         });
-        await feed.save();
+        const feedDoc = await feed.save();
+        if (userId) {
+          await this.userService.addFeedToUser(userId, feedDoc._id);
+        }
       } else {
         // Update the category if the feed already exists
         if (category) {
@@ -103,9 +111,12 @@ export class RssFeedService {
     }
   }
 
-  async fetchAndSaveAllRss() {
-    const feeds: Feed[] = await this.feedModel.find().exec();
-    // const urls = feeds.map((feed) => feed.url);
+  async fetchAndSaveAllRss(feedIds?: string[]) {
+    const feeds: Feed[] = await this.feedModel
+      .find(feedIds ? { _id: { $in: feedIds } } : {})
+      .exec();
+
+    console.log(feeds);
     const fetchResults = await Promise.all(
       feeds.map(async (feed) => {
         return { update: await this.fetchAndSaveRss(feed.url), feed };
@@ -116,6 +127,11 @@ export class RssFeedService {
 
   async getAllFeeds(): Promise<Feed[]> {
     return this.feedModel.find().exec();
+  }
+
+  async getFeedsByIds(feedIds: string[]): Promise<Feed[]> {
+    const objectIds = feedIds.map((id) => new Types.ObjectId(id));
+    return this.feedModel.find({ _id: { $in: objectIds } }).exec();
   }
 
   async getFeedItems(feedId: string): Promise<RssItem[]> {
@@ -139,10 +155,21 @@ export class RssFeedService {
       .exec();
   }
 
-  async getItems(page: number, limit: number): Promise<RssItem[]> {
+  async getItems(
+    page: number,
+    limit: number,
+    feeds?: string[],
+  ): Promise<RssItem[]> {
     const skip = (page - 1) * limit;
     return this.rssItemModel
-      .find({}, { plot_embedding: 0 })
+      .find(
+        feeds
+          ? { feed: { $in: feeds.map((id) => new Types.ObjectId(id)) } }
+          : {},
+        {
+          plot_embedding: 0,
+        },
+      )
       .sort({ pubDate: -1 })
       .skip(skip)
       .limit(limit)
@@ -163,15 +190,14 @@ export class RssFeedService {
   async deleteFeedByIdOrLink(
     identifier: string,
   ): Promise<{ deleted: boolean }> {
-    let feed;
-    if (Types.ObjectId.isValid(identifier)) {
-      feed = await this.feedModel.findByIdAndDelete(identifier).exec();
-    } else {
-      feed = await this.feedModel.findOneAndDelete({ url: identifier }).exec();
-    }
+    const query = Types.ObjectId.isValid(identifier)
+      ? { _id: identifier }
+      : { url: identifier };
+    const feed = await this.feedModel.findOneAndDelete(query).exec();
 
     if (feed) {
       await this.rssItemModel.deleteMany({ feed: feed._id }).exec();
+      await this.userService.removeFeedFromUsers(feed._id);
       return { deleted: true };
     } else {
       return { deleted: false };
@@ -187,7 +213,11 @@ export class RssFeedService {
     return feed.save();
   }
 
-  async vectorSearch(query: string, category?: string): Promise<RssItem[]> {
+  async vectorSearch(
+    query: string,
+    category?: string,
+    feedIds?: string[],
+  ): Promise<RssItem[]> {
     const pipeline: any[] = [];
 
     pipeline.push(
@@ -224,6 +254,14 @@ export class RssFeedService {
       pipeline.push({
         $match: {
           'feed.category': category,
+        },
+      });
+    }
+
+    if (feedIds && feedIds.length > 0) {
+      pipeline.push({
+        $match: {
+          'feed._id': { $in: feedIds.map((id) => new Types.ObjectId(id)) },
         },
       });
     }

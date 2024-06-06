@@ -35,6 +35,7 @@ const MediaPlayer: React.FC = () => {
                     controls
                     style={{ width: '100%', backgroundColor: 'transparent', color: 'black' }}
                     ref={audioRef}
+                    datatype="audio/mpeg"
                     onTimeUpdate={handleTimeUpdate}
                 >
                     <source src={audioUrl} type="audio/mpeg" />

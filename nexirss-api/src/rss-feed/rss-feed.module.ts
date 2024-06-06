@@ -8,6 +8,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { RssItemListener } from './events/rss-item.listener';
 import { TTSService } from './services/tts.service';
 import { TTSController } from './controllers/tts.controller';
+import { RssFeedUserController } from './controllers/rss-feed-user.controller';
 
 @Module({
   imports: [
@@ -18,6 +19,6 @@ import { TTSController } from './controllers/tts.controller';
     EventEmitterModule.forRoot(),
   ],
   providers: [RssFeedService, RssItemListener, TTSService],
-  controllers: [RssFeedController, TTSController],
+  controllers: [RssFeedController, RssFeedUserController, TTSController],
 })
 export class RssFeedModule {}

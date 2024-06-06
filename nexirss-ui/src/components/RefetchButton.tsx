@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Button, CircularProgress } from '@mui/material';
-import axios from 'axios';
-import {API_URL} from "../api-client/api";
+import apiClient, {API_URL} from "../api-client/api";
 
 const RefetchButton: React.FC = () => {
     const [loading, setLoading] = useState(false);
@@ -9,7 +8,7 @@ const RefetchButton: React.FC = () => {
     const handleClick = async () => {
         setLoading(true);
         try {
-            await axios.post(`${API_URL}/rss-feed/fetch-all`);
+            await apiClient.post(`/rss-feed/user/fetch-all`);
         } catch (error) {
             console.error('Error fetching the RSS feed:', error);
         } finally {

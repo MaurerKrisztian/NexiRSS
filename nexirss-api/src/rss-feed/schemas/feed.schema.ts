@@ -3,6 +3,8 @@ import { Document } from 'mongoose';
 
 @Schema()
 export class Feed extends Document {
+  _id: string;
+
   @Prop({ unique: true })
   url: string;
 

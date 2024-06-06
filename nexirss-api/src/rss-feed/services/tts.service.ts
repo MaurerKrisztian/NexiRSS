@@ -17,9 +17,6 @@ export interface IGridFsFile {
 @Injectable()
 export class TTSService {
   private bucket: GridFSBucket;
-  private openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
 
   constructor(
     @InjectModel('RssItem') private readonly rssItemModel: Model<RssItem>,
@@ -53,14 +50,20 @@ export class TTSService {
     return input;
   }
 
-  async generateTTS(postId: string) {
+  async generateTTS(
+    postId: string,
+    openaiApiKey: string,
+  ): Promise<{ ttsAudioId: string }> {
+    const openai = new OpenAI({
+      apiKey: openaiApiKey,
+    });
     const post: RssItem = await this.rssItemModel.findById(postId).exec();
     if (!post) {
       throw new Error('Post not found');
     }
 
     // Use OpenAI to generate the TTS
-    const ttsResponse = await this.openai.audio.speech.create({
+    const ttsResponse = await openai.audio.speech.create({
       model: 'tts-1',
       voice: 'alloy',
       input: this.truncateString(4000, this.sanitizeString(post.content)), // todo: max characters is 4000, remove images and tags etc
@@ -106,6 +109,10 @@ export class TTSService {
   async getTTS(id: string, res: any) {
     const ttsId = new ObjectId(id);
     const downloadStream = this.bucket.openDownloadStream(ttsId);
+    res.set({
+      'Content-Type': 'audio/mpeg', // Set the appropriate audio content type
+      'Content-Disposition': 'attachment; filename="audio.mp3"', // Optional: set a filename
+    });
     downloadStream.pipe(res);
   }
 }

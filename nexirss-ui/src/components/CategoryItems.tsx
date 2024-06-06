@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { List, Typography, CircularProgress, Box, Paper } from '@mui/material';
-import axios from 'axios';
 import FeedItemPreview from './FeedItemPreview';
-import {API_URL} from "../api-client/api";
+import apiClient from "../api-client/api";
 
 interface AudioInfo {
     length?: number;
@@ -28,12 +27,12 @@ const CategoryItems: React.FC = () => {
     useEffect(() => {
         const fetchItems = async () => {
             try {
-                const response = await axios.get(`${API_URL}/rss-feed/categories/${category}/items`);
+                const response = await apiClient.get(`/rss-feed/categories/${category}/items`);
                 const itemsWithAudioLength = await Promise.all(
                     response.data.map(async (item: FeedItem) => {
                         if (item.audioInfo && !item.audioInfo.length) {
                             try {
-                                const headResponse = await axios.head(item.audioInfo.url);
+                                const headResponse = await apiClient.head(item.audioInfo.url);
                                 const contentLength = headResponse.headers['content-length'];
                                 if (contentLength) {
                                     item.audioInfo.length = Number(contentLength);

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, Box, Paper, IconButton, List, ListItem, ListItemText, ListItemSecondaryAction, MenuItem } from '@mui/material';
-import axios from 'axios';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import {API_URL} from "../api-client/api";
+import apiClient from "../api-client/api";
 
 interface Feed {
     _id: string;
@@ -26,7 +25,7 @@ const FeedForm: React.FC = () => {
     useEffect(() => {
         const fetchFeeds = async () => {
             try {
-                const response = await axios.get(`${API_URL}/rss-feed/feeds`);
+                const response = await apiClient.get(`/rss-feed/user/feeds`);
                 setFeeds(response.data);
             } catch (error) {
                 console.error('Error fetching feeds:', error);
@@ -56,14 +55,14 @@ const FeedForm: React.FC = () => {
         }
 
         try {
-            await axios.post(`${API_URL}/rss-feed/fetch`, { url: finalUrl, category, maxItems });
+            await apiClient.post(`/rss-feed/fetch`, { url: finalUrl, category, maxItems });
             setUrl('');
             setCategory('');
             setFeedType('rss');
             setMediumType('profile');
             setMediumValue('');
             setMaxItems(3);
-            const response = await axios.get(`${API_URL}/rss-feed/feeds`);
+            const response = await apiClient.get(`/rss-feed/user/feeds`);
             setFeeds(response.data);
         } catch (error) {
             console.error('Error fetching the RSS feed:', error);
@@ -72,7 +71,7 @@ const FeedForm: React.FC = () => {
 
     const handleDelete = async (id: string) => {
         try {
-            await axios.delete(`${API_URL}/rss-feed/feed`, { data: { identifier: id } });
+            await apiClient.delete(`/rss-feed/feed`, { data: { identifier: id } });
             setFeeds(feeds.filter(feed => feed._id !== id));
         } catch (error) {
             console.error('Error deleting feed:', error);
