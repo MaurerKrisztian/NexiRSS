@@ -4,6 +4,7 @@ import FeedItemPreview from './FeedItemPreview';
 import SubscribedFeeds from './SubscribedFeeds';
 import RefetchButton from "./RefetchButton";
 import apiClient, {API_URL} from "../api-client/api";
+import BrowsFeeds from "./BrowsFeeds";
 
 interface Feed {
     _id: string;
@@ -87,6 +88,7 @@ const Home: React.FC = () => {
     return (
         <Box sx={{ mt: 2, mx: 'auto', maxWidth: 800, p: 2 }}>
             <SubscribedFeeds />
+            <BrowsFeeds></BrowsFeeds>
             {/*<CategoriesList categories={categories} />*/}
             <Divider sx={{ my: 2 }} />
             <Typography variant="h4" gutterBottom>

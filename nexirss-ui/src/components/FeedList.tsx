@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, Card, CardContent, CardMedia, Grid } from '@mui/material';
 import { Link } from 'react-router-dom';
 import apiClient from "../api-client/api";
+import BrowsFeeds from "./BrowsFeeds";
 
 interface Feed {
     _id: string;
@@ -37,6 +38,7 @@ const FeedListPage: React.FC = () => {
 
     return (
         <Box sx={{ mt: 2, mx: 'auto', maxWidth: 800, p: 2 }}>
+            <BrowsFeeds></BrowsFeeds>
             <Typography variant="h4" gutterBottom>
                 Subscribed Feeds
             </Typography>

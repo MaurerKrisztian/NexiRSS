@@ -17,6 +17,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import Login from './components/Login';
 import {updateToken} from "./api-client/api";
 import UserInfo from "./components/UserInfo";
+import BrowsFeeds from "./components/BrowsFeeds";
 
 const App: React.FC = () => {
   const [authData, setAuthData] = useState<string | null>(localStorage.getItem('token'));
@@ -76,6 +77,7 @@ const App: React.FC = () => {
                           <Route path="/items/:postId" element={<PostContent />} />
                           <Route path="/categories/:category/items" element={<CategoryItems />} />
                           <Route path="/profile" element={<UserInfo />} />
+                          {/*<Route path="/browsfeeds" element={<BrowsFeeds />} />*/}
                           <Route path="*" element={<Navigate to="/" />} />
                         </Routes>
                       </Box>

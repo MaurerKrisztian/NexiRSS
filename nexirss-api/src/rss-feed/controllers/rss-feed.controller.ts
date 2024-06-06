@@ -48,9 +48,14 @@ export class RssFeedController {
   }
 
   @Get('feeds')
-  async getAllFeeds(): Promise<Feed[]> {
-    return this.rssFeedService.getAllFeeds();
+  async getFeeds(
+    @Query('search') search: string,
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ): Promise<{ feeds: Feed[]; totalPages: number }> {
+    return this.rssFeedService.getAllFeeds(search, page, limit);
   }
+
   @Get('feeds/:feedId')
   async getFeedById(@Param('feedId') feedId: string): Promise<Feed> {
     return this.rssFeedService.getFeedById(feedId);

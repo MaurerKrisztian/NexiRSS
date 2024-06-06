@@ -125,8 +125,30 @@ export class RssFeedService {
     return fetchResults;
   }
 
-  async getAllFeeds(): Promise<Feed[]> {
-    return this.feedModel.find().exec();
+  async getAllFeeds(
+    search: string,
+    page: number,
+    limit: number,
+  ): Promise<{ feeds: Feed[]; totalPages: number }> {
+    const query = search
+      ? {
+          $or: [
+            { title: { $regex: search, $options: 'i' } },
+            { description: { $regex: search, $options: 'i' } },
+          ],
+        }
+      : {};
+
+    const feeds = await this.feedModel
+      .find(query)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .exec();
+
+    const totalFeeds = await this.feedModel.countDocuments(query).exec();
+    const totalPages = Math.ceil(totalFeeds / limit);
+
+    return { feeds, totalPages };
   }
 
   async getFeedsByIds(feedIds: string[]): Promise<Feed[]> {

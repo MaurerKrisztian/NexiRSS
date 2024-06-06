@@ -28,6 +28,15 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     return (
         <Container>
             <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100vh">
+                <Typography variant="h2" gutterBottom>
+                    Welcome to NexiRSS
+                </Typography>
+                <Typography variant="h5" gutterBottom>
+                    Ignore the noise, focus on the important things.
+                </Typography>
+                <Typography variant="body1" paragraph>
+                    NexiRSS is your one-stop RSS feed web app that supports any RSS feed, provides TSS features, podcast listening with saved progress, and YouTube channel subscriptions.
+                </Typography>
                 <Typography variant="h4" gutterBottom>
                     Login to NexiRSS
                 </Typography>
