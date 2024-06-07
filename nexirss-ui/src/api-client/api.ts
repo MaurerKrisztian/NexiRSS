@@ -1,7 +1,7 @@
 import axios from "axios";
+import {apiUrl} from "../envs";
 
-export const API_URL = "https://nexirss-production.up.railway.app/api"
-// export const API_URL = "http://localhost:3000/api"//"https://nexirss-production.up.railway.app/api"
+export const API_URL = apiUrl
 
 const apiClient = axios.create({
     baseURL: API_URL,

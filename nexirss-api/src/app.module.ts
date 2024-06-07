@@ -8,6 +8,7 @@ import * as process from 'node:process';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from './user/user.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Global()
 @Module({
@@ -20,6 +21,7 @@ import { UserModule } from './user/user.module';
     RssFeedModule,
     AuthModule,
     UserModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

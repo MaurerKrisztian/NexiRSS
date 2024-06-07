@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Container, Typography, CircularProgress, Avatar, Box, TextField, Button } from '@mui/material';
 import apiClient from "../api-client/api";
 import {Link} from "react-router-dom";
+import PushNotification from "./PushNotification";
 
 export interface IUser {
     _id: string;
@@ -123,6 +124,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ showFullProfile = true }) => {
                             {isUpdating ? 'Updating...' : 'Update API Key'}
                         </Button>
                     </Box>
+                    <PushNotification />
                 </Box>
             ) : (
                 <Link to="/profile" style={{ textDecoration: 'none', color: 'inherit' }}> <Avatar style={{ margin: '10px' }} src={user.picture} alt={user.name} /> </Link>
