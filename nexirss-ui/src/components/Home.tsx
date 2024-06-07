@@ -4,7 +4,7 @@ import FeedItemPreview from './FeedItemPreview';
 import SubscribedFeeds from './SubscribedFeeds';
 import RefetchButton from "./RefetchButton";
 import apiClient from "../api-client/api";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 
 interface Feed {
     _id: string;
@@ -83,12 +83,18 @@ const Home: React.FC = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [handleScroll]);
 
+    const handleRefetch = () => {
+        setItems([]);
+        setPage(1);
+        setHasMore(true);
+        fetchItems(1);
+    };
+
     if (loading) {
         return <CircularProgress />;
     }
 
     return (
-
         <Box sx={{ mt: 2, mx: 'auto', maxWidth: 800, p: 2 }}>
             {feeds.length === 0 && (
                 <Alert severity="warning">
@@ -96,28 +102,24 @@ const Home: React.FC = () => {
                 </Alert>
             )}
 
-
             {feeds.length > 0 && (
-               <div>
-                   <SubscribedFeeds />
-                   {/*<BrowsFeeds></BrowsFeeds>*/}
-                   {/*<CategoriesList categories={categories} />*/}
-                   <Divider sx={{ my: 2 }} />
-                   <Typography variant="h4" gutterBottom>
-                       <RefetchButton></RefetchButton>
-                   </Typography>
-                   <List>
-                       {items.map(item => (
-                           <FeedItemPreview
-                               key={item._id}
-                               item={item}
-                           />
-                       ))}
-                   </List>
-                   {loading && <CircularProgress />}
-               </div>
+                <div>
+                    <SubscribedFeeds />
+                    <Divider sx={{ my: 2 }} />
+                    <Typography variant="h4" gutterBottom>
+                        <RefetchButton onRefetch={handleRefetch} />
+                    </Typography>
+                    <List>
+                        {items.map(item => (
+                            <FeedItemPreview
+                                key={item._id}
+                                item={item}
+                            />
+                        ))}
+                    </List>
+                    {loading && <CircularProgress />}
+                </div>
             )}
-
         </Box>
     );
 };

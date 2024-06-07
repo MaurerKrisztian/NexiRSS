@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
 import { Box, Button, CircularProgress } from '@mui/material';
-import apiClient, {API_URL} from "../api-client/api";
+import apiClient from "../api-client/api";
 
-const RefetchButton: React.FC = () => {
+interface RefetchButtonProps {
+    onRefetch: () => void;
+}
+
+const RefetchButton: React.FC<RefetchButtonProps> = ({ onRefetch }) => {
     const [loading, setLoading] = useState(false);
 
     const handleClick = async () => {
         setLoading(true);
         try {
             await apiClient.post(`/rss-feed/user/fetch-all`);
+            onRefetch();
         } catch (error) {
             console.error('Error fetching the RSS feed:', error);
         } finally {
