@@ -28,7 +28,7 @@ NexiRSS is an  RSS feed aggregator. It allows you to manage RSS feeds, including
 | Save items                 |                                                                                           | ❌ Not Implemented  |
 | History                    |                                                                                           | ❌ Not Implemented  |
 | Main feed                  |                                                                                           | 🛠️ Working on it  |
-| TTS                        | text to speech with OpenAI                                                                | ✅ Working on it   |
+| TTS                        | text to speech with OpenAI                                                                | ✅ Implemented   |
 
 ## Future Plan
 
@@ -64,7 +64,7 @@ NexiRSS is an  RSS feed aggregator. It allows you to manage RSS feeds, including
    cd NexiRSS
    ```
 2. Install dependencies for the API:
-    - create .env file based on .env-template
+    - create .env file based on .env-template (generate push notification keys via `npx web-push generate-vapid-keys`)
     ```bash
       cd nexirrs-api
       npm install
