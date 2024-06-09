@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Button, Box } from '@mui/material';
 import apiClient from "../api-client/api";
 import {pushNotificationPublicKey} from "../envs";
+import {requestPermission} from "../utils/permission.util";
 
 const PushNotification: React.FC = () => {
     useEffect(() => {
@@ -64,6 +65,7 @@ const PushNotification: React.FC = () => {
     };
 
     const handleSendNotification = async () => {
+        await requestPermission();
         try {
             await apiClient.post('/notifications', { message: 'Hello, this is a test notification!' });
         } catch (error) {

@@ -4,6 +4,7 @@ import { List, Typography, CircularProgress, Box, Paper, CardMedia, Divider, But
 import { Notifications, NotificationsOff } from '@mui/icons-material';
 import FeedItemPreview from './FeedItemPreview';
 import apiClient from "../api-client/api";
+import {requestPermission} from "../utils/permission.util";
 
 interface AudioInfo {
     length?: number;
@@ -101,6 +102,8 @@ const FeedItemsByFeedId: React.FC = () => {
     };
 
     const toggleNotifications = async () => {
+        await requestPermission();
+
         try {
             const newNotificationStatus = !notificationsEnabled;
             await apiClient.patch('/rss-feed/user/update-feed', { feedId, notifications: newNotificationStatus });

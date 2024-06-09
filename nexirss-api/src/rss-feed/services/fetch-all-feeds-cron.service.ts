@@ -40,7 +40,7 @@ export class FetchAllFeedsCronService {
     try {
       const feeds = await this.feedModel.find();
 
-      const success = 0;
+      let success = 0;
       const total = feeds.length;
       const bar = new ProgressBar(
         `Fetching ${feeds.length} rss feed [:bar] :percent | :current/:total documents | :etas`,
@@ -65,6 +65,7 @@ export class FetchAllFeedsCronService {
           null,
           feed.category,
         );
+        success += 1;
         bar.tick();
       }
       this.logger.log('Successfully fetched all RSS feeds');
