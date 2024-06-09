@@ -5,8 +5,10 @@ import * as Parser from 'rss-parser';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { RssItem } from '../schemas/rss-item.schema';
 import { Feed } from '../schemas/feed.schema';
-import { User } from '../../user/models/user.schema';
 import { UserService } from '../../user/user.service';
+import { FetchAllFeedsCronService } from './fetch-all-feeds-cron.service';
+import { FetchRssFeedService } from './fetch-rss-feed.service';
+import { IFeedSubscription } from '../../user/models/user.schema';
 
 @Injectable()
 export class RssFeedService {
@@ -16,110 +18,29 @@ export class RssFeedService {
   constructor(
     @InjectModel(RssItem.name) private readonly rssItemModel: Model<RssItem>,
     @InjectModel(Feed.name) private readonly feedModel: Model<Feed>,
-    @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly eventEmitter: EventEmitter2,
     private readonly userService: UserService,
+    private readonly fetchAllFeedsCronService: FetchAllFeedsCronService,
+    private readonly fetchRssFeedService: FetchRssFeedService,
   ) {
     this.parser = new Parser({ customFields: { item: ['media:group'] } });
   }
 
-  async fetchAndSaveRss(
-    url: string,
-    userId?: string,
-    category?: string,
-    maxItems = 3,
-  ): Promise<{ newItems: number; totalItems: number }> {
-    try {
-      let feed = await this.feedModel.findOne({ url });
-      if (!feed) {
-        const feedData = await this.parser.parseURL(url);
-        console.log(JSON.stringify(feedData, null, 2));
+  async fetchAndSaveAllRss(feedSubscriptions?: IFeedSubscription[]) {
+    const feedIds = feedSubscriptions?.map((s) => {
+      s.feed;
+    });
 
-        const getImage = (rss) => {
-          if (feedData.image !== undefined) {
-            return typeof feedData.image == 'string'
-              ? feedData.image
-              : feedData.image?.url;
-          }
-          return feedData.image || feedData?.itunes?.image;
-        };
-        feed = new this.feedModel({
-          url,
-          title: feedData.title,
-          description: feedData.description,
-          image: getImage(feedData),
-          category,
-        });
-        const feedDoc = await feed.save();
-        if (userId) {
-          await this.userService.addFeedToUser(userId, feedDoc._id);
-        }
-      } else {
-        // Update the category if the feed already exists
-        if (category) {
-          feed.category = category;
-        }
-        await feed.save();
-      }
-
-      const feedData = await this.parser.parseURL(url);
-      // console.log(JSON.stringify(feedData, null, 2));
-      let newItems = 0;
-
-      const processData = feedData.items.slice(0, maxItems);
-      for (const item of processData) {
-        const existingItem = await this.rssItemModel.findOne({
-          link: item.link,
-        });
-        if (!existingItem) {
-          const audioInfo = item.enclosure
-            ? {
-                length: item.enclosure.length,
-                type: item.enclosure.type,
-                url: item.enclosure.url,
-              }
-            : undefined;
-
-          const rssItem = new this.rssItemModel({
-            title: item.title,
-            link: item.link,
-            image:
-              item.image ||
-              item?.['media:group']?.['media:thumbnail'][0]?.['$']?.url,
-            pubDate: new Date(item.pubDate),
-            content:
-              item['content:encoded'] ||
-              item.content ||
-              item.description ||
-              item.contentSnippet ||
-              item?.['media:group']?.['media:description'][0],
-            feed: feed._id,
-            audioInfo,
-          });
-          const res = await rssItem.save();
-          console.log('res: ', res);
-          newItems++;
-          this.eventEmitter.emit('rss.item.new', rssItem);
-        }
-      }
-
-      return { newItems, totalItems: processData.length };
-    } catch (error) {
-      console.error('RssFeedService', error.message);
-      this.logger.error(`Failed to fetch RSS feed from ${url}`, error.stack);
-      throw new Error(`Failed to fetch RSS feed from ${url}`);
-    }
-  }
-
-  async fetchAndSaveAllRss(feedIds?: string[]) {
     const feeds: Feed[] = await this.feedModel
       .find(feedIds ? { _id: { $in: feedIds } } : {})
       .exec();
 
-    console.log(feeds);
     const fetchResults = await Promise.all(
       feeds.map(async (feed) => {
-        return { update: await this.fetchAndSaveRss(feed.url), feed };
+        return {
+          update: await this.fetchRssFeedService.fetchAndSaveRss(feed.url),
+          feed,
+        };
       }),
     );
     return fetchResults;

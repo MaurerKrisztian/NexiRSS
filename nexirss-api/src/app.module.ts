@@ -9,6 +9,8 @@ import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from './user/user.module';
 import { NotificationModule } from './notification/notification.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Global()
 @Module({
@@ -22,6 +24,8 @@ import { NotificationModule } from './notification/notification.module';
     AuthModule,
     UserModule,
     NotificationModule,
+    EventEmitterModule.forRoot(),
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],

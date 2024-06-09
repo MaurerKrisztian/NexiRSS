@@ -26,11 +26,17 @@ export class NotificationsController {
     @Body() body: { message: string },
     @AuthUser() user: User,
   ) {
-    return this.notificationsService.sendNotification(body.message, [user._id]);
+    return this.notificationsService.sendNotification(
+      { title: 'test', body: body.message },
+      [user._id],
+    );
   }
 
-  @Get('/user')
-  async getNotifications(@AuthUser() user: User) {
+  @Get(':userId')
+  async getNotifications(
+    @Param('userId') userId: string,
+    @AuthUser() user: User,
+  ) {
     return this.notificationsService.getNotifications(user._id);
   }
 }

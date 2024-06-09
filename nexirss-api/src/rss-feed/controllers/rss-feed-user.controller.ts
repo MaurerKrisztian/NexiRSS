@@ -5,9 +5,9 @@ import {
   Get,
   Param,
   Delete,
-  Put,
   Query,
   UseGuards,
+  Patch,
 } from '@nestjs/common';
 import { RssFeedService } from '../services/rss-feed.service';
 import { Feed } from '../schemas/feed.schema';
@@ -16,22 +16,45 @@ import { JwtAuthGuard } from '../../auth/guards/jwt.guard';
 import { AuthUser } from '../../auth/decorators/user.decorator';
 import { User } from '../../user/models/user.schema';
 import { UserService } from '../../user/user.service';
-@Controller('rss-feed/user')
+import { FetchRssFeedService } from '../services/fetch-rss-feed.service';
+import { FetchAllFeedsCronService } from '../services/fetch-all-feeds-cron.service';
+@Controller('rss-feed/:userId')
 @UseGuards(JwtAuthGuard)
 export class RssFeedUserController {
   constructor(
     private readonly rssFeedService: RssFeedService,
     private readonly userService: UserService,
+    private readonly fetchRssFeedService: FetchRssFeedService,
+    private readonly fetchAllFeedsCronService: FetchAllFeedsCronService,
   ) {}
 
   @Post('fetch-all')
   async fetchAllRssFeed(@AuthUser() user: User) {
-    return this.rssFeedService.fetchAndSaveAllRss(user.feeds);
+    return this.rssFeedService.fetchAndSaveAllRss(user.feedSubscriptions);
   }
 
   @Post('add-feed')
-  async addFeed(@Body('feedId') feed: string, @AuthUser() user: User) {
-    return this.userService.addFeedToUser(user._id, feed);
+  async addFeed(
+    @Body() feedSubscription: { feedId: string; notifications?: boolean },
+    @AuthUser() user: User,
+  ) {
+    return this.userService.addFeedToUser(
+      user._id,
+      feedSubscription.feedId,
+      feedSubscription.notifications,
+    );
+  }
+
+  @Patch('update-feed')
+  async updateFeed(
+    @Body() feedSubscription: { feedId: string; notifications?: boolean },
+    @AuthUser() user: User,
+  ) {
+    return this.userService.updateFeedSubscription(
+      user._id,
+      feedSubscription.feedId,
+      feedSubscription.notifications,
+    );
   }
   @Delete('remove-feed')
   async removeFeed(@Body('feedId') feed: string, @AuthUser() user: User) {
@@ -40,7 +63,7 @@ export class RssFeedUserController {
 
   @Get('subscriptions')
   async getSubscription(@AuthUser() user: User) {
-    return user.feeds || [];
+    return user.feedSubscriptions || [];
   }
 
   @Post('vector-search')
@@ -49,12 +72,16 @@ export class RssFeedUserController {
     @Body('category') category: string,
     @AuthUser() user: User,
   ): Promise<RssItem[]> {
-    return this.rssFeedService.vectorSearch(query, category, user.feeds);
+    return this.rssFeedService.vectorSearch(
+      query,
+      category,
+      user.subscriptionIds,
+    );
   }
 
   @Get('feeds')
   async getAllFeeds(@AuthUser() user: User): Promise<Feed[]> {
-    return this.rssFeedService.getFeedsByIds(user.feeds);
+    return this.rssFeedService.getFeedsByIds(user.subscriptionIds);
   }
 
   @Get('feeds/:feedId/items')
@@ -68,7 +95,7 @@ export class RssFeedUserController {
     @Query('limit') limit: number,
     @AuthUser() user: User,
   ) {
-    return this.rssFeedService.getItems(page, limit, user.feeds);
+    return this.rssFeedService.getItems(page, limit, user.subscriptionIds);
   }
 
   @Get('items/:id')

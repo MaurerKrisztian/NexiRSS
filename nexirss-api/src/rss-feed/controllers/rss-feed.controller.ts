@@ -15,18 +15,21 @@ import { RssItem } from '../schemas/rss-item.schema';
 import { JwtAuthGuard } from '../../auth/guards/jwt.guard';
 import { AuthUser } from '../../auth/decorators/user.decorator';
 import { User } from '../../user/models/user.schema';
+import { FetchRssFeedService } from '../services/fetch-rss-feed.service';
 @Controller('rss-feed')
 @UseGuards(JwtAuthGuard)
 export class RssFeedController {
-  constructor(private readonly rssFeedService: RssFeedService) {}
+  constructor(
+    private readonly rssFeedService: RssFeedService,
+    private readonly fetchRssFeedService: FetchRssFeedService,
+  ) {}
 
   @Post('fetch')
   async fetchRssFeed(
     @Body() body: { url: string; category: string; maxItems?: number },
     @AuthUser() user: User,
   ): Promise<{ newItems: number; totalItems: number }> {
-    console.log('uuuuuuu', user);
-    return this.rssFeedService.fetchAndSaveRss(
+    return this.fetchRssFeedService.fetchAndSaveRss(
       body.url,
       user?._id,
       body.category,

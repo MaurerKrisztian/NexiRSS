@@ -1,11 +1,21 @@
-self.addEventListener('push', function(event) {
+self.addEventListener('push', function (event) {
     const data = event.data.json();
-    const options = {
-        body: data.message,
-        icon: '/icon.png', // Your icon here
-        badge: '/badge.png' // Your badge here
-    };
     event.waitUntil(
-        self.registration.showNotification(data.title, options)
+        self.registration.showNotification(data.title || "NexiRSS", {
+            badge: 'https://nexirss.netlify.app/logo192.png',
+            icon: 'https://nexirss.netlify.app/logo192.png',
+            data: {
+                url: 'https://nexirss.netlify.app'
+            },
+            ...data,
+        })
+    );
+});
+
+self.addEventListener('notificationclick', function (event) {
+    console.log("On notification click: ", event.notification);
+    event.notification.close();
+    event.waitUntil(
+        clients.openWindow(event.notification.data.url)
     );
 });

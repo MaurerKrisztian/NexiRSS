@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { List, Typography, CircularProgress, Box, Paper, CardMedia, Divider, Button } from '@mui/material';
+import { List, Typography, CircularProgress, Box, Paper, CardMedia, Divider, Button, IconButton } from '@mui/material';
+import { Notifications, NotificationsOff } from '@mui/icons-material';
 import FeedItemPreview from './FeedItemPreview';
 import apiClient from "../api-client/api";
 
@@ -33,6 +34,7 @@ const FeedItemsByFeedId: React.FC = () => {
     const [items, setItems] = useState<FeedItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [isSubscribed, setIsSubscribed] = useState(false);
+    const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
     useEffect(() => {
         const fetchFeedDetails = async () => {
@@ -68,7 +70,9 @@ const FeedItemsByFeedId: React.FC = () => {
             try {
                 const response = await apiClient.get(`/rss-feed/user/subscriptions`);
                 const subscribedFeeds = response.data;
-                setIsSubscribed(subscribedFeeds.includes(feedId));
+                const subscribedFeed = subscribedFeeds.find((sub: any) => sub.feed === feedId);
+                setIsSubscribed(!!subscribedFeed);
+                setNotificationsEnabled(subscribedFeed?.notifications || false);
             } catch (error) {
                 console.error('Error checking subscription status:', error);
             }
@@ -80,7 +84,7 @@ const FeedItemsByFeedId: React.FC = () => {
 
     const handleSubscribe = async () => {
         try {
-            await apiClient.post('/rss-feed/user/add-feed', { feedId });
+            await apiClient.post('/rss-feed/user/add-feed', { feedId, notifications: notificationsEnabled });
             setIsSubscribed(true);
         } catch (error) {
             console.error('Error subscribing to feed:', error);
@@ -93,6 +97,16 @@ const FeedItemsByFeedId: React.FC = () => {
             setIsSubscribed(false);
         } catch (error) {
             console.error('Error unsubscribing from feed:', error);
+        }
+    };
+
+    const toggleNotifications = async () => {
+        try {
+            const newNotificationStatus = !notificationsEnabled;
+            await apiClient.patch('/rss-feed/user/update-feed', { feedId, notifications: newNotificationStatus });
+            setNotificationsEnabled(newNotificationStatus);
+        } catch (error) {
+            console.error('Error updating notification status:', error);
         }
     };
 
@@ -118,13 +132,20 @@ const FeedItemsByFeedId: React.FC = () => {
                     <Typography variant="body1" gutterBottom>
                         {feed.description}
                     </Typography>
-                    <Button
-                        variant="contained"
-                        color={isSubscribed ? "secondary" : "primary"}
-                        onClick={isSubscribed ? handleUnsubscribe : handleSubscribe}
-                    >
-                        {isSubscribed ? "Unsubscribe" : "Subscribe"}
-                    </Button>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Button
+                            variant="contained"
+                            color={isSubscribed ? "secondary" : "primary"}
+                            onClick={isSubscribed ? handleUnsubscribe : handleSubscribe}
+                        >
+                            {isSubscribed ? "Unsubscribe" : "Subscribe"}
+                        </Button>
+                        {isSubscribed && (
+                            <IconButton onClick={toggleNotifications} sx={{ ml: 2 }}>
+                                {notificationsEnabled ? <Notifications /> : <NotificationsOff />}
+                            </IconButton>
+                        )}
+                    </Box>
                     <Divider sx={{ my: 2 }} />
                 </>
             )}
