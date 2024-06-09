@@ -32,8 +32,7 @@ export class FetchAllFeedsCronService {
     @InjectModel(Feed.name) private readonly feedModel: Model<Feed>,
   ) {}
 
-  // @Cron('0 0 */3 * * *')
-  @Cron(getCronJobEveryXSeconds(60))
+  @Cron('0 0 */3 * * *')
   @MeasureMethodAsync()
   async fetchAllRssCron() {
     this.logger.log('Fetching all RSS feeds');
