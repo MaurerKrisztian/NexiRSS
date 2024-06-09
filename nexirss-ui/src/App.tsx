@@ -17,7 +17,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import Login from './components/Login';
 import {updateToken} from "./api-client/api";
 import UserInfo from "./components/UserInfo";
-import BrowsFeeds from "./components/BrowsFeeds";
+import AiAnalyticsSetup from "./components/AiAnalyticsSetup";
 
 const App: React.FC = () => {
   const [authData, setAuthData] = useState<string | null>(localStorage.getItem('token'));
@@ -55,6 +55,9 @@ const App: React.FC = () => {
                         <Button color="inherit" component={Link} to="/feeds">
                           Feeds
                         </Button>
+                          <Button color="inherit" component={Link} to="/ai">
+                          AI analytics
+                        </Button>
                         <Button color="inherit" component={Link} to="/create">
                           Manage Feed
                         </Button>
@@ -72,6 +75,7 @@ const App: React.FC = () => {
                         <Routes>
                           <Route path="/" element={<Home />} />
                           <Route path="/feeds" element={<FeedList />} />
+                          <Route path="/ai" element={<AiAnalyticsSetup />} />
                           <Route path="/create" element={<FeedForm />} />
                           <Route path="/feeds/:feedId/items" element={<FeedItemsByFeedId />} />
                           <Route path="/items/:postId" element={<PostContent />} />

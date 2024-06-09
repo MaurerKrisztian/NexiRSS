@@ -9,6 +9,55 @@ export class UserService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
+  async addAiAnalyticsSetting(
+    userId: string,
+    setting: { prompt: string; notifications: boolean; highlight: boolean },
+  ) {
+    const user = await this.userModel
+      .findByIdAndUpdate(
+        { _id: userId },
+        { $push: { aiAnalysisSettings: setting } },
+        { new: true },
+      )
+      .exec();
+
+    return user
+      .toObject()
+      .aiAnalysisSettings.find((i) => i.prompt == setting.prompt);
+  }
+
+  async updateAiAnalyticsSetting(
+    userId: string,
+    setting: {
+      _id: string;
+      prompt: string;
+      notifications: boolean;
+      highlight: boolean;
+    },
+  ) {
+    return this.userModel
+      .updateOne(
+        { _id: userId, 'aiAnalysisSettings._id': setting._id },
+        {
+          $set: {
+            'aiAnalysisSettings.$.prompt': setting.prompt,
+            'aiAnalysisSettings.$.notifications': setting.notifications,
+            'aiAnalysisSettings.$.highlight': setting.highlight,
+          },
+        },
+      )
+      .exec();
+  }
+
+  async deleteAiAnalyticsSetting(userId: string, settingId: string) {
+    return this.userModel
+      .updateOne(
+        { _id: userId },
+        { $pull: { aiAnalysisSettings: { _id: settingId } } },
+      )
+      .exec();
+  }
+
   async removeFeedFromUsers(feedId: string) {
     return this.userModel
       .updateMany(

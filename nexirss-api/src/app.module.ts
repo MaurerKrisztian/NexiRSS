@@ -11,6 +11,7 @@ import { UserModule } from './user/user.module';
 import { NotificationModule } from './notification/notification.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
+import { OpenAiModule } from './gpt-client/openai.module';
 
 @Global()
 @Module({
@@ -20,6 +21,7 @@ import { ScheduleModule } from '@nestjs/schedule';
       secret: process.env.JWT_SECRET,
     }),
     MongooseModule.forRoot(process.env.DB_URL),
+    OpenAiModule,
     RssFeedModule,
     AuthModule,
     UserModule,

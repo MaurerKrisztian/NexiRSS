@@ -5,6 +5,23 @@ export interface IFeedSubscription {
   notifications: boolean;
 }
 
+@Schema()
+export class AiAnalysisSetting {
+  @Prop({ type: MongooseSchema.Types.ObjectId, auto: true })
+  _id: string;
+
+  @Prop({ required: true })
+  prompt: string;
+
+  @Prop({ default: false })
+  notifications: boolean;
+
+  @Prop({ default: false })
+  highlight: boolean;
+}
+
+const AiAnalysisSettingSchema = SchemaFactory.createForClass(AiAnalysisSetting);
+
 @Schema({
   strict: false,
   virtuals: true,
@@ -34,6 +51,9 @@ export class User extends Document {
 
   @Prop({ required: false })
   openaiApiKey: string;
+
+  @Prop({ type: [AiAnalysisSettingSchema], required: false, default: [] })
+  aiAnalysisSettings: AiAnalysisSetting[];
 
   get feeds() {
     return this.feedSubscriptions.map((sub) => sub.feed);
