@@ -72,16 +72,12 @@ export class RssFeedUserController {
     @Body('category') category: string,
     @AuthUser() user: User,
   ): Promise<RssItem[]> {
-    return this.rssFeedService.vectorSearch(
-      query,
-      category,
-      user.subscriptionIds,
-    );
+    return this.rssFeedService.vectorSearch(query, category, user.feeds);
   }
 
   @Get('feeds')
   async getAllFeeds(@AuthUser() user: User): Promise<Feed[]> {
-    return this.rssFeedService.getFeedsByIds(user.subscriptionIds);
+    return this.rssFeedService.getFeedsByIds(user.feeds);
   }
 
   @Get('feeds/:feedId/items')
@@ -95,7 +91,7 @@ export class RssFeedUserController {
     @Query('limit') limit: number,
     @AuthUser() user: User,
   ) {
-    return this.rssFeedService.getItems(page, limit, user.subscriptionIds);
+    return this.rssFeedService.getItems(page, limit, user.feeds);
   }
 
   @Get('items/:id')

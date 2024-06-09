@@ -5,7 +5,12 @@ export interface IFeedSubscription {
   notifications: boolean;
 }
 
-@Schema({ strict: false })
+@Schema({
+  strict: false,
+  virtuals: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true },
+})
 export class User extends Document {
   _id: string;
 
@@ -30,13 +35,13 @@ export class User extends Document {
   @Prop({ required: false })
   openaiApiKey: string;
 
-  get subscriptionIds() {
+  get feeds() {
     return this.feedSubscriptions.map((sub) => sub.feed);
   }
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
-UserSchema.virtual('subscriptionIds').get(function () {
+UserSchema.virtual('feeds').get(function () {
   return this.feedSubscriptions.map((sub) => sub.feed);
 });
