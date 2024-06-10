@@ -11,7 +11,7 @@ import { UserModule } from './user/user.module';
 import { NotificationModule } from './notification/notification.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
-import { OpenAiModule } from './gpt-client/openai.module';
+import { OpenAiModule } from './ai-assistant/openai.module';
 
 @Global()
 @Module({
@@ -31,6 +31,12 @@ import { OpenAiModule } from './gpt-client/openai.module';
   ],
   controllers: [AppController],
   providers: [AppService],
-  exports: [AuthModule, UserModule],
+  exports: [
+    AuthModule,
+    UserModule,
+    RssFeedModule,
+    OpenAiModule,
+    NotificationModule,
+  ],
 })
 export class AppModule {}

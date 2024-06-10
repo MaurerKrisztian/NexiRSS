@@ -32,5 +32,6 @@ import { NotificationsService } from '../notification/notifications.service';
     NotificationsService,
   ],
   controllers: [RssFeedController, RssFeedUserController, TTSController],
+  exports: [MongooseModule],
 })
 export class RssFeedModule {}

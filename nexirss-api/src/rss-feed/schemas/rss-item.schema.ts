@@ -47,6 +47,12 @@ export class RssItem extends Document {
 
   @Prop({ type: [Number], index: '2dsphere' }) // Adding 2dsphere index
   plot_embedding: number[];
+
+  @Prop({ type: [String], required: false, default: [] })
+  labels: string[];
+
+  @Prop({ required: false })
+  summary?: string;
 }
 
 export const RssItemSchema = SchemaFactory.createForClass(RssItem);

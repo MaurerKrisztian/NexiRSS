@@ -10,7 +10,7 @@ export class OpenAiService {
     apiKey: string,
     prompt: string,
     model: (string & {}) | ChatAPI.ChatModel = 'gpt-3.5-turbo',
-    maxTokens = 2000,
+    maxTokens = 5000,
   ): Promise<string> {
     try {
       const openai = new OpenAI({ apiKey });
