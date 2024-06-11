@@ -48,6 +48,16 @@ export class NotificationsController {
   ) {
     return this.notificationsService.deleteSubscription(user.id, id);
   }
+  @Delete('subscriptions')
+  async deleteSubscription(
+    @Body('endpoint') endpoint: string,
+    @AuthUser() user: User,
+  ) {
+    return this.notificationsService.deleteSubscriptionByEndpoint(
+      user.id,
+      endpoint,
+    );
+  }
 
   @Post()
   async sendNotification(

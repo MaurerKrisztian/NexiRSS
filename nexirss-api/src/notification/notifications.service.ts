@@ -48,6 +48,15 @@ export class NotificationsService {
       _id: subscriptionId,
     });
   }
+  deleteSubscriptionByEndpoint(
+    userId: string,
+    endpoint: string,
+  ): Promise<unknown> {
+    return this.subscriptionModel.deleteOne({
+      userId: userId,
+      endpoint: endpoint,
+    });
+  }
 
   async subscribe(
     userId: string,
