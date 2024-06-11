@@ -1,5 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+export enum Category {
+  YOUTUBE = 'YOUTUBE',
+  PODCAST = 'PODCAST',
+  VIDEO = 'VIDEO',
+  BLOG = 'BLOG',
+  UNKNOWN = 'UNKNOWN',
+}
 
 @Schema()
 export class Feed extends Document {
@@ -17,8 +24,8 @@ export class Feed extends Document {
   @Prop()
   description: string;
 
-  @Prop()
-  category: string;
+  @Prop({ enum: Category })
+  category: Category;
 }
 
 export const FeedSchema = SchemaFactory.createForClass(Feed);

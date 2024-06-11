@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, CircularProgress, Avatar, Box, TextField, Button } from '@mui/material';
+import { Container, Typography, CircularProgress, Avatar, Box, TextField, Button, IconButton, InputAdornment, List, ListItem, ListItemText, ListItemSecondaryAction } from '@mui/material';
+import { Visibility, VisibilityOff, Delete as DeleteIcon } from '@mui/icons-material';
 import apiClient from "../api-client/api";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import PushNotification from "./PushNotification";
 
 export interface IUser {
@@ -21,12 +22,20 @@ interface UserInfoProps {
     showFullProfile?: boolean;
 }
 
+interface ISubscription {
+    _id: string;
+    endpoint: string;
+    deviceInfo?: { osName?: string; osVersion?: string; type?: string }
+}
+
 const UserInfo: React.FC<UserInfoProps> = ({ showFullProfile = true }) => {
     const [user, setUser] = useState<IUser | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [apiKey, setApiKey] = useState<string>('');
     const [isUpdating, setIsUpdating] = useState<boolean>(false);
+    const [showApiKey, setShowApiKey] = useState<boolean>(false);
+    const [subscriptions, setSubscriptions] = useState<ISubscription[]>([]);
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -42,7 +51,17 @@ const UserInfo: React.FC<UserInfoProps> = ({ showFullProfile = true }) => {
             }
         };
 
+        const fetchSubscriptions = async () => {
+            try {
+                const response = await apiClient.get('/notifications/subscriptions');
+                setSubscriptions(response.data);
+            } catch (err) {
+                setError('Failed to fetch subscriptions');
+            }
+        };
+
         fetchUserInfo();
+        fetchSubscriptions();
     }, []);
 
     const handleApiKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,6 +78,19 @@ const UserInfo: React.FC<UserInfoProps> = ({ showFullProfile = true }) => {
             setError('Failed to update API key');
         } finally {
             setIsUpdating(false);
+        }
+    };
+
+    const handleToggleApiKeyVisibility = () => {
+        setShowApiKey(!showApiKey);
+    };
+
+    const handleDeleteSubscription = async (subscriptionId: string) => {
+        try {
+            await apiClient.delete(`/notifications/subscriptions/${subscriptionId}`);
+            setSubscriptions(subscriptions.filter(sub => sub._id !== subscriptionId));
+        } catch (err) {
+            setError('Failed to delete subscription');
         }
     };
 
@@ -113,6 +145,20 @@ const UserInfo: React.FC<UserInfoProps> = ({ showFullProfile = true }) => {
                             value={apiKey}
                             onChange={handleApiKeyChange}
                             placeholder="Enter your OpenAI API Key"
+                            type={showApiKey ? 'text' : 'password'}
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle API key visibility"
+                                            onClick={handleToggleApiKeyVisibility}
+                                            edge="end"
+                                        >
+                                            {showApiKey ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
+                            }}
                         />
                         <Button
                             variant="contained"
@@ -124,10 +170,30 @@ const UserInfo: React.FC<UserInfoProps> = ({ showFullProfile = true }) => {
                             {isUpdating ? 'Updating...' : 'Update API Key'}
                         </Button>
                     </Box>
+                    <Box mt={4} width="100%">
+                        <Typography variant="h6">Notification Subscriptions</Typography>
+                        <List>
+                            {subscriptions.map(subscription => (
+                                <ListItem key={subscription._id}>
+                                    <ListItemText
+                                        primary={`${`${subscription?.deviceInfo?.osName} ${subscription?.deviceInfo?.osVersion}`} Subscription`}
+                                        secondary={"active"}
+                                    />
+                                    <ListItemSecondaryAction>
+                                        <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteSubscription(subscription._id)}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </ListItemSecondaryAction>
+                                </ListItem>
+                            ))}
+                        </List>
+                    </Box>
                     <PushNotification />
                 </Box>
             ) : (
-                <Link to="/profile" style={{ textDecoration: 'none', color: 'inherit' }}> <Avatar style={{ margin: '10px' }} src={user.picture} alt={user.name} /> </Link>
+                <Link to="/profile" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <Avatar style={{ margin: '10px' }} src={user.picture} alt={user.name} />
+                </Link>
             )}
         </div>
     );

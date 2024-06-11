@@ -3,6 +3,7 @@ import { Button, Box } from '@mui/material';
 import apiClient from "../api-client/api";
 import {pushNotificationPublicKey} from "../envs";
 import {requestPermission} from "../utils/permission.util";
+import * as rdd from 'react-device-detect';
 
 const PushNotification: React.FC = () => {
     useEffect(() => {
@@ -31,14 +32,15 @@ const PushNotification: React.FC = () => {
         const vapidPublicKey = pushNotificationPublicKey
         const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
 
+        const deviceInfo = { type: rdd.deviceType, osName: rdd.osName, osVersion: rdd.osVersion }
         swReg.pushManager.subscribe({
             userVisibleOnly: true,
             applicationServerKey: convertedVapidKey
         })
             .then(subscription => {
-                console.log('User is subscribed:', subscription);
+                console.log('User is subscribed:', { subscription, deviceInfo});
 
-                apiClient.post('/notifications/subscribe', subscription)
+                apiClient.post('/notifications/subscribe', { subscription, deviceInfo})
                     .then(response => {
                         console.log('Subscription sent to server:', response.data);
                     })

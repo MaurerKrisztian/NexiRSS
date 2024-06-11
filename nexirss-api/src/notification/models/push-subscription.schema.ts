@@ -14,6 +14,8 @@ export class PushSubscription extends Document {
     auth: string;
     p256dh: string;
   };
+  @Prop({ required: false, type: Object })
+  deviceInfo: { osName?: string; osVersion?: string; type?: string };
 }
 
 export const PushSubscriptionSchema =

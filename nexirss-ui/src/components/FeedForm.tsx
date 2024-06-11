@@ -25,6 +25,13 @@ interface Feed {
     category: string;
 }
 
+const categories = {
+    rss: ['BLOG', 'PODCAST', 'VIDEO', 'YOUTUBE', 'UNKNOWN'],
+    youtube: ['YOUTUBE'],
+    devto: ['BLOG'],
+    medium: ['BLOG']
+};
+
 const FeedForm: React.FC = () => {
     const [url, setUrl] = useState('');
     const [category, setCategory] = useState('');
@@ -47,6 +54,16 @@ const FeedForm: React.FC = () => {
 
         fetchFeeds();
     }, []);
+
+    useEffect(() => {
+        // Automatically set category if there's only one option
+        const availableCategories = categories[feedType];
+        if (availableCategories.length === 1) {
+            setCategory(availableCategories[0]);
+        } else {
+            setCategory(''); // Reset category if there are multiple options
+        }
+    }, [feedType]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -115,7 +132,10 @@ const FeedForm: React.FC = () => {
                         fullWidth
                         margin="normal"
                         value={feedType}
-                        onChange={(e) => setFeedType(e.target.value)}
+                        onChange={(e) => {
+                            setFeedType(e.target.value);
+                            setCategory(''); // Reset category when feed type changes
+                        }}
                     >
                         <MenuItem value="rss">RSS</MenuItem>
                         <MenuItem value="youtube">YouTube</MenuItem>
@@ -161,13 +181,21 @@ const FeedForm: React.FC = () => {
                         onChange={(e) => feedType === 'medium' ? setMediumValue(e.target.value) : setUrl(e.target.value)}
                     />
                     <TextField
+                        select
                         label="Category"
                         variant="outlined"
                         fullWidth
                         margin="normal"
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
-                    />
+                        required
+                    >
+                        {categories[feedType].map((cat) => (
+                            <MenuItem key={cat} value={cat}>
+                                {cat}
+                            </MenuItem>
+                        ))}
+                    </TextField>
                     <TextField
                         label="Max Items"
                         type="number"

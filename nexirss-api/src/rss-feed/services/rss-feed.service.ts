@@ -4,7 +4,7 @@ import { Model, Types } from 'mongoose';
 import * as Parser from 'rss-parser';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { RssItem } from '../schemas/rss-item.schema';
-import { Feed } from '../schemas/feed.schema';
+import { Category, Feed } from '../schemas/feed.schema';
 import { UserService } from '../../user/user.service';
 import { FetchAllFeedsCronService } from './fetch-all-feeds-cron.service';
 import { FetchRssFeedService } from './fetch-rss-feed.service';
@@ -147,7 +147,7 @@ export class RssFeedService {
     }
   }
 
-  async updateFeedCategory(id: string, category: string): Promise<Feed> {
+  async updateFeedCategory(id: string, category: Category): Promise<Feed> {
     const feed = await this.feedModel.findById(id);
     if (!feed) {
       throw new Error('Feed not found');

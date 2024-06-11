@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { RssFeedService } from '../services/rss-feed.service';
-import { Feed } from '../schemas/feed.schema';
+import { Category, Feed } from '../schemas/feed.schema';
 import { RssItem } from '../schemas/rss-item.schema';
 import { JwtAuthGuard } from '../../auth/guards/jwt.guard';
 import { AuthUser } from '../../auth/decorators/user.decorator';
@@ -26,7 +26,7 @@ export class RssFeedController {
 
   @Post('fetch')
   async fetchRssFeed(
-    @Body() body: { url: string; category: string; maxItems?: number },
+    @Body() body: { url: string; category: Category; maxItems?: number },
     @AuthUser() user: User,
   ): Promise<{ newItems: number; totalItems: number }> {
     return this.fetchRssFeedService.fetchAndSaveRss(
@@ -96,7 +96,7 @@ export class RssFeedController {
   @Put('feed/:id')
   async updateFeedCategory(
     @Param('id') id: string,
-    @Body('category') category: string,
+    @Body('category') category: Category,
   ): Promise<Feed> {
     return this.rssFeedService.updateFeedCategory(id, category);
   }

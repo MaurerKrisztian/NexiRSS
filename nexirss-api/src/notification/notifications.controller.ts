@@ -1,4 +1,12 @@
-import { Controller, Post, Body, UseGuards, Get, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Get,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { AuthUser } from '../auth/decorators/user.decorator';
@@ -11,14 +19,34 @@ export class NotificationsController {
 
   @Post('subscribe')
   async subscribe(
-    @Body() body: { endpoint: string; keys: { auth: string; p256dh: string } },
+    @Body()
+    body: {
+      subscription: {
+        endpoint: string;
+        keys: { auth: string; p256dh: string };
+      };
+      deviceInfo: { osName: string; osVersion: string; type: string };
+    },
     @AuthUser() user: User,
   ) {
-    const subscription = await this.notificationsService.subscribe(
-      user._id,
-      body,
-    );
+    const subscription = await this.notificationsService.subscribe(user._id, {
+      ...body.subscription,
+      deviceInfo: body.deviceInfo,
+    });
     return { message: 'Subscribed', subscription };
+  }
+
+  @Get('subscriptions')
+  async getSubscriptions(@AuthUser() user: User) {
+    return this.notificationsService.getSubscriptions(user.id);
+  }
+
+  @Delete('subscriptions/:subscriptionId')
+  async deleteSubscriptions(
+    @Param('subscriptionId') id: string,
+    @AuthUser() user: User,
+  ) {
+    return this.notificationsService.deleteSubscription(user.id, id);
   }
 
   @Post()

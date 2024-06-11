@@ -38,12 +38,23 @@ export class NotificationsService {
     );
   }
 
+  getSubscriptions(userId: string): Promise<Subscription[]> {
+    return this.subscriptionModel.find({ userId: userId });
+  }
+
+  deleteSubscription(userId: string, subscriptionId: string): Promise<unknown> {
+    return this.subscriptionModel.deleteOne({
+      userId: userId,
+      _id: subscriptionId,
+    });
+  }
+
   async subscribe(
     userId: string,
-    subscriptionData: {
-      endpoint: string;
-      keys: { auth: string; p256dh: string };
-    },
+    subscriptionData: Pick<
+      PushSubscription,
+      'deviceInfo' | 'endpoint' | 'keys'
+    >,
   ) {
     const subscription = new this.subscriptionModel({
       userId,

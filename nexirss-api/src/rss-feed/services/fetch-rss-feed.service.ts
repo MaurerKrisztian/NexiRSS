@@ -5,7 +5,7 @@ import * as Parser from 'rss-parser';
 import { InjectModel } from '@nestjs/mongoose';
 import { RssItem } from '../schemas/rss-item.schema';
 import { Model } from 'mongoose';
-import { Feed } from '../schemas/feed.schema';
+import { Category, Feed } from '../schemas/feed.schema';
 import { User } from '../../user/models/user.schema';
 import { UserService } from '../../user/user.service';
 
@@ -27,7 +27,7 @@ export class FetchRssFeedService {
   async fetchAndSaveRss(
     url: string,
     userId?: string,
-    category?: string,
+    category?: Category,
     maxItems = 3,
   ): Promise<{ newItems: number; totalItems: number }> {
     try {
@@ -46,7 +46,7 @@ export class FetchRssFeedService {
 
   private async getOrCreateFeed(
     url: string,
-    category?: string,
+    category?: Category,
     userId?: string,
   ) {
     let feed = await this.feedModel.findOne({ url });
