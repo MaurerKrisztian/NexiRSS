@@ -30,14 +30,6 @@ NexiRSS is an  RSS feed aggregator. It allows you to manage RSS feeds, including
 | Main feed                  |                                                                                           | 🛠️ Working on it  |
 | TTS                        | text to speech with OpenAI                                                                | ✅ Implemented   |
 
-## Future Plan
-
-### AI Triggers
-
-- **AI Content Analysis**: Use AI to analyze new articles.
-- **Trigger Descriptions**: Define criteria for triggering notifications or emails.
-- **Automated Notifications**: Automatically send notifications or emails when triggers apply.
-
 ## Getting Started
 
 ### Prerequisites
