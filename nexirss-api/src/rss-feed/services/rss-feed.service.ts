@@ -102,17 +102,30 @@ export class RssFeedService {
     page: number,
     limit: number,
     feeds?: string[],
+    category?: string, // Assuming category is of type string
   ): Promise<RssItem[]> {
     const skip = (page - 1) * limit;
+    const feedQuery: any = {};
+
+    if (feeds) {
+      feedQuery._id = { $in: feeds.map((id) => new Types.ObjectId(id)) };
+    }
+
+    if (category) {
+      feedQuery.category = { $regex: new RegExp(category, 'i') }; // Case-insensitive regex
+    }
+
+    const matchingFeeds = await this.feedModel
+      .find(feedQuery, { _id: 1 })
+      .exec();
+    const matchingFeedIds = matchingFeeds.map((feed) => feed._id);
+
+    const itemQuery: any = {
+      feed: { $in: matchingFeedIds },
+    };
+
     return this.rssItemModel
-      .find(
-        feeds
-          ? { feed: { $in: feeds.map((id) => new Types.ObjectId(id)) } }
-          : {},
-        {
-          plot_embedding: 0,
-        },
-      )
+      .find(itemQuery, { plot_embedding: 0 })
       .sort({ pubDate: -1 })
       .skip(skip)
       .limit(limit)

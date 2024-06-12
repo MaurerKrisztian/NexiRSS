@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { List, Typography, CircularProgress, Box, Divider, Alert } from '@mui/material';
+import { List, Typography, CircularProgress, Box, Divider, Alert, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import FeedItemPreview from './FeedItemPreview';
 import SubscribedFeeds from './SubscribedFeeds';
 import RefetchButton from "./RefetchButton";
@@ -37,13 +37,14 @@ const Home: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
+    const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
     useEffect(() => {
         const fetchCategories = async () => {
             try {
                 const response = await apiClient.get(`/rss-feed/user/feeds`);
                 const feeds: Feed[] = response.data || [];
-                setFeeds(feeds)
+                setFeeds(feeds);
                 const uniqueCategories = Array.from(new Set(feeds.map(feed => feed.category))).filter(e => e !== undefined);
                 setCategories(uniqueCategories);
                 setLoading(false);
@@ -55,9 +56,10 @@ const Home: React.FC = () => {
         fetchCategories();
     }, []);
 
-    const fetchItems = useCallback(async (page: number) => {
+    const fetchItems = useCallback(async (page: number, category: string) => {
         try {
-            const response = await apiClient.get(`/rss-feed/user/items?page=${page}&limit=10`);
+            const categoryQuery = category !== 'all' ? category : '';
+            const response = await apiClient.get(`/rss-feed/user/items?page=${page}&limit=10&category=${categoryQuery}`);
             const newItems: FeedItem[] = response.data;
             setItems(prevItems => [...prevItems, ...newItems]);
             if (newItems.length === 0) {
@@ -69,8 +71,8 @@ const Home: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        fetchItems(page);
-    }, [page, fetchItems]);
+        fetchItems(page, selectedCategory);
+    }, [page, selectedCategory, fetchItems]);
 
     const handleScroll = useCallback(() => {
         if (window.innerHeight + document.documentElement.scrollTop + 1 >= document.documentElement.scrollHeight && hasMore) {
@@ -87,7 +89,15 @@ const Home: React.FC = () => {
         setItems([]);
         setPage(1);
         setHasMore(true);
-        fetchItems(1);
+        fetchItems(1, selectedCategory);
+    };
+
+    const handleCategoryChange: any = (event: React.ChangeEvent<{ value: unknown }>) => {
+        setSelectedCategory(event.target.value as string);
+        setItems([]);
+        setPage(1);
+        setHasMore(true);
+        fetchItems(1, event.target.value as string);
     };
 
     if (loading) {
@@ -108,6 +118,23 @@ const Home: React.FC = () => {
                     <Divider sx={{ my: 2 }} />
                     <Typography variant="h4" gutterBottom>
                         <RefetchButton onRefetch={handleRefetch} />
+                        <FormControl variant="outlined" sx={{ minWidth: 120, ml: 2 }}>
+                            <InputLabel id="category-select-label">Category</InputLabel>
+                            <Select
+                                labelId="category-select-label"
+                                id="category-select"
+                                value={selectedCategory}
+                                onChange={handleCategoryChange}
+                                label="Category"
+                            >
+                                <MenuItem value="all">All</MenuItem>
+                                {categories.map(category => (
+                                    <MenuItem key={category} value={category}>
+                                        {category}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
                     </Typography>
                     <List>
                         {items.map(item => (

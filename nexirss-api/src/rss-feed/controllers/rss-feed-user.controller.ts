@@ -10,7 +10,7 @@ import {
   Patch,
 } from '@nestjs/common';
 import { RssFeedService } from '../services/rss-feed.service';
-import { Feed } from '../schemas/feed.schema';
+import { Category, Feed } from '../schemas/feed.schema';
 import { RssItem } from '../schemas/rss-item.schema';
 import { JwtAuthGuard } from '../../auth/guards/jwt.guard';
 import { AuthUser } from '../../auth/decorators/user.decorator';
@@ -89,9 +89,10 @@ export class RssFeedUserController {
   async getItems(
     @Query('page') page: number,
     @Query('limit') limit: number,
+    @Query('category') category: Category,
     @AuthUser() user: User,
   ) {
-    return this.rssFeedService.getItems(page, limit, user.feeds);
+    return this.rssFeedService.getItems(page, limit, user.feeds, category);
   }
 
   @Get('items/:id')
