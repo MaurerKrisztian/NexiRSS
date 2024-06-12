@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { ListItem, ListItemText, IconButton, Avatar, Box, Button, Typography, CircularProgress, Snackbar, Alert } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
@@ -33,12 +33,13 @@ interface FeedItem {
     summary?: string;
 }
 
-interface FeedItemPreviewProps {
-    item: FeedItem;
-}
-
 interface User {
     openaiApiKey?: string;
+}
+
+interface FeedItemPreviewProps {
+    item: FeedItem;
+    user: User | null;
 }
 
 const formatTime = (seconds: number) => {
@@ -60,30 +61,16 @@ const bytesToSeconds = (bytes: number, bitrate = 128000) => {
 
 const placeholderImage = 'https://via.placeholder.com/150';
 
-const FeedItemPreview: React.FC<FeedItemPreviewProps> = ({ item }) => {
+const FeedItemPreview: React.FC<FeedItemPreviewProps> = ({ item, user }) => {
     const [showSummary, setShowSummary] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [summary, setSummary] = useState(item.summary);
     const [labels, setLabels] = useState(item.labels || []);
-    const [user, setUser] = useState<User | null>(null);
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const theme = useTheme(); // Get the current theme
     const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // Check if the screen size is mobile
     const audioPosition = localStorage.getItem(`audioPosition-${item._id}`);
     const audioLength = item.audioInfo ? bytesToSeconds(Number(item.audioInfo.length)) : 0;
-
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const response = await apiClient.get('/auth/me');
-                setUser(response.data);
-            } catch (error) {
-                console.error('Error fetching user:', error);
-            }
-        };
-
-        fetchUser();
-    }, []);
 
     const handleSummaryToggle = (e: React.MouseEvent) => {
         e.stopPropagation();

@@ -1,51 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Container, Typography, CircularProgress, Avatar, Box, TextField, Button, IconButton, InputAdornment } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import apiClient from "../api-client/api";
 import { Link } from "react-router-dom";
 import PushNotification from "./PushNotification";
-
-export interface IUser {
-    _id: string;
-    email: string;
-    email_verified: boolean;
-    name: string;
-    picture: string;
-    given_name: string;
-    family_name: string;
-    feeds: string[];
-    openaiApiKey?: string;
-    __v: number;
-}
+import useUser from '../hooks/useUser';
 
 interface UserInfoProps {
     showFullProfile?: boolean;
 }
 
 const UserInfo: React.FC<UserInfoProps> = ({ showFullProfile = true }) => {
-    const [user, setUser] = useState<IUser | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
+    const { user, setUser, loading, error } = useUser();
     const [apiKey, setApiKey] = useState<string>('');
     const [isUpdating, setIsUpdating] = useState<boolean>(false);
     const [showApiKey, setShowApiKey] = useState<boolean>(false);
 
-    useEffect(() => {
-        const fetchUserInfo = async () => {
-            try {
-                const response = await apiClient.get('/auth/me');
-                const user: IUser = response.data;
-                setUser(user);
-                setApiKey(user.openaiApiKey || '');
-            } catch (err) {
-                setError('Failed to fetch user info');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchUserInfo();
-    }, []);
+    React.useEffect(() => {
+        if (user) {
+            setApiKey(user.openaiApiKey || '');
+        }
+    }, [user]);
 
     const handleApiKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setApiKey(e.target.value);
@@ -58,7 +33,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ showFullProfile = true }) => {
             await apiClient.patch(`/users/${user._id}`, { openaiApiKey: apiKey });
             setUser({ ...user, openaiApiKey: apiKey });
         } catch (err) {
-            setError('Failed to update API key');
+            console.error('Failed to update API key', err);
         } finally {
             setIsUpdating(false);
         }

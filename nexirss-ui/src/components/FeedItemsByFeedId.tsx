@@ -4,7 +4,8 @@ import { List, Typography, CircularProgress, Box, Paper, CardMedia, Divider, But
 import { Notifications, NotificationsOff } from '@mui/icons-material';
 import FeedItemPreview from './FeedItemPreview';
 import apiClient from "../api-client/api";
-import {requestPermission} from "../utils/permission.util";
+import { requestPermission } from "../utils/permission.util";
+import useUser from "../hooks/useUser";
 
 interface AudioInfo {
     length?: number;
@@ -31,6 +32,7 @@ interface FeedItem {
 
 const FeedItemsByFeedId: React.FC = () => {
     const { feedId } = useParams<{ feedId: string }>();
+    const { user, loading: userLoading, error: userError, refreshUser } = useUser();
     const [feed, setFeed] = useState<Feed | null>(null);
     const [items, setItems] = useState<FeedItem[]>([]);
     const [loading, setLoading] = useState(true);
@@ -87,6 +89,7 @@ const FeedItemsByFeedId: React.FC = () => {
         try {
             await apiClient.post('/rss-feed/user/add-feed', { feedId, notifications: notificationsEnabled });
             setIsSubscribed(true);
+            await refreshUser();
         } catch (error) {
             console.error('Error subscribing to feed:', error);
         }
@@ -96,6 +99,7 @@ const FeedItemsByFeedId: React.FC = () => {
         try {
             await apiClient.delete('/rss-feed/user/remove-feed', { data: { feedId } });
             setIsSubscribed(false);
+            await refreshUser();
         } catch (error) {
             console.error('Error unsubscribing from feed:', error);
         }
@@ -108,13 +112,22 @@ const FeedItemsByFeedId: React.FC = () => {
             const newNotificationStatus = !notificationsEnabled;
             await apiClient.patch('/rss-feed/user/update-feed', { feedId, notifications: newNotificationStatus });
             setNotificationsEnabled(newNotificationStatus);
+            await refreshUser();
         } catch (error) {
             console.error('Error updating notification status:', error);
         }
     };
 
-    if (loading) {
-        return <CircularProgress />;
+    // if (loading || userLoading) {
+    //     return <CircularProgress />;
+    // }
+
+    if (userError) {
+        return (
+            <Box sx={{ mt: 2, mx: 'auto', maxWidth: 800, p: 2 }}>
+                <Typography color="error">{userError}</Typography>
+            </Box>
+        );
     }
 
     return (
@@ -158,7 +171,7 @@ const FeedItemsByFeedId: React.FC = () => {
             <Paper elevation={3} sx={{ p: 2 }}>
                 <List>
                     {items.map((item) => (
-                        <FeedItemPreview key={item._id} item={item} />
+                        <FeedItemPreview key={item._id} item={item} user={user} />
                     ))}
                 </List>
             </Paper>

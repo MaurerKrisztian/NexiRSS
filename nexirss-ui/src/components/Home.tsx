@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { List, Typography, CircularProgress, Box, Divider, Alert, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { List, Typography, CircularProgress, Box, Divider, Alert, Select, MenuItem, FormControl, InputLabel, Container } from '@mui/material';
 import FeedItemPreview from './FeedItemPreview';
 import SubscribedFeeds from './SubscribedFeeds';
 import RefetchButton from "./RefetchButton";
 import apiClient from "../api-client/api";
 import { Link } from "react-router-dom";
+import useUser from '../hooks/useUser';
 
 interface Feed {
     _id: string;
@@ -31,6 +32,7 @@ interface FeedItem {
 }
 
 const Home: React.FC = () => {
+    const { user, loading: userLoading, error: userError } = useUser();
     const [categories, setCategories] = useState<string[]>([]);
     const [feeds, setFeeds] = useState<Feed[]>([]);
     const [items, setItems] = useState<FeedItem[]>([]);
@@ -40,21 +42,29 @@ const Home: React.FC = () => {
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
     useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const response = await apiClient.get(`/rss-feed/user/feeds`);
-                const feeds: Feed[] = response.data || [];
-                setFeeds(feeds);
-                const uniqueCategories = Array.from(new Set(feeds.map(feed => feed.category))).filter(e => e !== undefined);
-                setCategories(uniqueCategories);
+        const fetchFeeds = async () => {
+            if (user && user.feeds.length > 0) {
+                try {
+                    const response = await apiClient.get(`/rss-feed/user/feeds`, {
+                        params: {
+                            ids: user.feeds.join(',')
+                        }
+                    });
+                    const feeds: Feed[] = response.data || [];
+                    setFeeds(feeds);
+                    const uniqueCategories = Array.from(new Set(feeds.map(feed => feed.category))).filter(e => e !== undefined);
+                    setCategories(uniqueCategories);
+                    setLoading(false);
+                } catch (error) {
+                    console.error('Error fetching feeds:', error);
+                }
+            } else {
                 setLoading(false);
-            } catch (error) {
-                console.error('Error fetching categories:', error);
             }
         };
 
-        fetchCategories();
-    }, []);
+        fetchFeeds();
+    }, [user]);
 
     const fetchItems = useCallback(async (page: number, category: string) => {
         try {
@@ -71,8 +81,10 @@ const Home: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        fetchItems(page, selectedCategory);
-    }, [page, selectedCategory, fetchItems]);
+        if (!userLoading && user) {
+            fetchItems(page, selectedCategory);
+        }
+    }, [page, selectedCategory, fetchItems, userLoading, user]);
 
     const handleScroll = useCallback(() => {
         if (window.innerHeight + document.documentElement.scrollTop + 1 >= document.documentElement.scrollHeight && hasMore) {
@@ -99,6 +111,18 @@ const Home: React.FC = () => {
         setHasMore(true);
         fetchItems(1, event.target.value as string);
     };
+
+    if (userLoading) {
+        return <CircularProgress />;
+    }
+
+    if (userError) {
+        return (
+            <Container>
+                <Typography color="error">{userError}</Typography>
+            </Container>
+        );
+    }
 
     if (loading) {
         return <CircularProgress />;
@@ -137,11 +161,8 @@ const Home: React.FC = () => {
                         </FormControl>
                     </Typography>
                     <List>
-                        {items.map(item => (
-                            <FeedItemPreview
-                                key={item._id}
-                                item={item}
-                            />
+                        {items.map((item) => (
+                            <FeedItemPreview key={item._id} item={item} user={user} />
                         ))}
                     </List>
                     {loading && <CircularProgress />}

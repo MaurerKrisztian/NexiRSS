@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { List, Typography, CircularProgress, Box, Paper } from '@mui/material';
 import FeedItemPreview from './FeedItemPreview';
 import apiClient from "../api-client/api";
+import useUser from '../hooks/useUser';
 
 interface AudioInfo {
     length?: number;
@@ -21,6 +22,7 @@ interface FeedItem {
 
 const CategoryItems: React.FC = () => {
     const { category } = useParams<{ category: string }>();
+    const { user, loading: userLoading, error: userError } = useUser();
     const [items, setItems] = useState<FeedItem[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -54,8 +56,16 @@ const CategoryItems: React.FC = () => {
         fetchItems();
     }, [category]);
 
-    if (loading) {
+    if (loading || userLoading) {
         return <CircularProgress />;
+    }
+
+    if (userError) {
+        return (
+            <Box sx={{ mt: 2, mx: 'auto', maxWidth: 800, p: 2 }}>
+                <Typography color="error">{userError}</Typography>
+            </Box>
+        );
     }
 
     return (
@@ -69,6 +79,7 @@ const CategoryItems: React.FC = () => {
                         <FeedItemPreview
                             key={item._id}
                             item={item}
+                            user={user}
                         />
                     ))}
                 </List>

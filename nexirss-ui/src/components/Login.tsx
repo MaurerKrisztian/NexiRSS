@@ -1,14 +1,16 @@
 import React from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { Box, Typography, Container } from '@mui/material';
-import axios from 'axios';
-import apiClient, {API_URL, updateToken} from '../api-client/api';
+import apiClient, { updateToken } from '../api-client/api';
+import useUser from '../hooks/useUser';
 
 interface LoginProps {
     onLoginSuccess: (token: string) => void;
 }
 
 const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
+    const { setUser } = useUser();
+
     const handleLoginSuccess = async (credentialResponse: any) => {
         console.log('Google credential response:', credentialResponse);
         try {
@@ -20,6 +22,10 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             localStorage.setItem('token', access_token);
             onLoginSuccess(access_token);
             console.log('JWT token:', access_token);
+
+            // Fetch and set the user data
+            const userResponse = await apiClient.get('/auth/me');
+            setUser(userResponse.data);
         } catch (error) {
             console.error('Error during Google login:', error);
         }
@@ -29,7 +35,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         <Container>
             <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height="100vh">
                 <Typography variant="h2" gutterBottom>
-                    Welcome to NexiRSS
+                    NexiRSS
                 </Typography>
                 <Typography variant="h5" gutterBottom>
                     Ignore the noise, focus on the important things.

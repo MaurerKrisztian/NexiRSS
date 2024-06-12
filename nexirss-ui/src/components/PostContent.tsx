@@ -8,7 +8,7 @@ import 'highlight.js/styles/atom-one-dark-reasonable.css';
 import dateFormat from 'dateformat';
 import { useAudio } from './AudioContext';
 import apiClient, { API_URL } from '../api-client/api';
-import {IUser} from "./UserInfo";
+import {IUser} from "../hooks/types/IUser";
 
 interface AudioInfo {
     length: string;

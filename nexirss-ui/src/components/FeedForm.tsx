@@ -17,6 +17,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import apiClient from "../api-client/api";
 import BrowsFeeds from "./BrowsFeeds";
+import useUser from "../hooks/useUser";
 
 interface Feed {
     _id: string;
@@ -41,6 +42,7 @@ const FeedForm: React.FC = () => {
     const [maxItems, setMaxItems] = useState(3);
     const [feeds, setFeeds] = useState<Feed[]>([]);
     const navigate = useNavigate();
+    const { user, loading: userLoading, error: userError, refreshUser } = useUser();
 
     useEffect(() => {
         const fetchFeeds = async () => {
@@ -94,6 +96,7 @@ const FeedForm: React.FC = () => {
             setMaxItems(3);
             const response = await apiClient.get(`/rss-feed/user/feeds`);
             setFeeds(response.data);
+            refreshUser()
         } catch (error) {
             console.error('Error fetching the RSS feed:', error);
         }
@@ -106,6 +109,7 @@ const FeedForm: React.FC = () => {
         } catch (error) {
             console.error('Error deleting feed:', error);
         }
+        refreshUser()
     };
 
     const handleEdit = (id: string) => {
@@ -113,6 +117,7 @@ const FeedForm: React.FC = () => {
         if (feed) {
             setUrl(feed.url);
             setCategory(feed.category);
+            refreshUser()
         }
     };
 
