@@ -21,6 +21,7 @@ import Login from './components/Login';
 import { updateToken } from "./api-client/api";
 import UserInfo from "./components/UserInfo";
 import AiAnalyticsSetup from "./components/AiAnalyticsSetup";
+import LandingPage from "./components/LandingPage";
 
 const App: React.FC = () => {
     const [authData, setAuthData] = useState<string | null>(localStorage.getItem('token'));
@@ -131,6 +132,7 @@ const App: React.FC = () => {
                                     <Box mt={2}>
                                         <Routes>
                                             <Route path="/" element={<Home />} />
+                                            <Route path="/landingpage" element={<LandingPage />} />
                                             <Route path="/feeds" element={<FeedList />} />
                                             <Route path="/ai" element={<AiAnalyticsSetup />} />
                                             <Route path="/create" element={<FeedForm />} />
@@ -146,6 +148,9 @@ const App: React.FC = () => {
                             </>
                         ) : (
                             <Routes>
+                                <Route path="/" element={<LandingPage />} />
+                                <Route path="/landingpage" element={<LandingPage />} />
+                                <Route path="/login" element={<Login onLoginSuccess={handleLoginSuccess} />}  />
                                 <Route path="*" element={<Login onLoginSuccess={handleLoginSuccess} />} />
                             </Routes>
                         )}
