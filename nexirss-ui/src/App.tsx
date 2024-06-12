@@ -44,7 +44,7 @@ const App: React.FC = () => {
 
     const drawer = (
         <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
-            <Typography variant="h6" sx={{ my: 2 }}>
+            <Typography style={{ textDecoration: 'none', color: '#90caf9' }} component={Link} to="/" variant="h6" sx={{ my: 2 }}>
                 NexiRSS
             </Typography>
             <List>
@@ -80,7 +80,7 @@ const App: React.FC = () => {
                             <>
                                 <AppBar position="static">
                                     <Toolbar>
-                                        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                                        <Typography  component={Link} to="/"  style={{ textDecoration: 'none', color: '#90caf9' }} variant="h6" sx={{ flexGrow: 1 }}>
                                             NexiRSS
                                         </Typography>
                                         <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center' }}>
