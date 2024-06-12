@@ -90,9 +90,16 @@ export class RssFeedUserController {
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('category') category: Category,
+    @Query('search') search: string,
     @AuthUser() user: User,
   ) {
-    return this.rssFeedService.getItems(page, limit, user.feeds, category);
+    return this.rssFeedService.getItems(
+      page,
+      limit,
+      user.feeds,
+      category,
+      search,
+    );
   }
 
   @Get('items/:id')

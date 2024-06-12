@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { List, Typography, CircularProgress, Box, Divider, Alert, Select, MenuItem, FormControl, InputLabel, Container } from '@mui/material';
+import { List, Typography, CircularProgress, Box, Divider, Alert, Select, MenuItem, FormControl, InputLabel, Container, TextField, IconButton } from '@mui/material';
 import FeedItemPreview from './FeedItemPreview';
 import SubscribedFeeds from './SubscribedFeeds';
-import RefetchButton from "./RefetchButton";
+import RefreshIcon from '@mui/icons-material/Refresh';
 import apiClient from "../api-client/api";
 import { Link } from "react-router-dom";
 import useUser from '../hooks/useUser';
@@ -40,6 +40,8 @@ const Home: React.FC = () => {
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
+    const [searchQuery, setSearchQuery] = useState<string>('');
+    const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>('');
 
     useEffect(() => {
         const fetchFeeds = async () => {
@@ -66,12 +68,20 @@ const Home: React.FC = () => {
         fetchFeeds();
     }, [user]);
 
-    const fetchItems = useCallback(async (page: number, category: string) => {
+    const fetchItems = useCallback(async (page: number, category: string, search: string) => {
         try {
             const categoryQuery = category !== 'all' ? category : '';
-            const response = await apiClient.get(`/rss-feed/user/items?page=${page}&limit=10&category=${categoryQuery}`);
+            console.log('Fetching items with:', { page, categoryQuery, search });
+            const response = await apiClient.get(`/rss-feed/user/items`, {
+                params: {
+                    page,
+                    limit: 10,
+                    category: categoryQuery,
+                    search
+                }
+            });
             const newItems: FeedItem[] = response.data;
-            setItems(prevItems => [...prevItems, ...newItems]);
+            setItems(prevItems => page === 1 ? newItems : [...prevItems, ...newItems]);
             if (newItems.length === 0) {
                 setHasMore(false);
             }
@@ -82,9 +92,15 @@ const Home: React.FC = () => {
 
     useEffect(() => {
         if (!userLoading && user) {
-            fetchItems(page, selectedCategory);
+            fetchItems(1, selectedCategory, debouncedSearchQuery);
         }
-    }, [page, selectedCategory, fetchItems, userLoading, user]);
+    }, [selectedCategory, debouncedSearchQuery, fetchItems, userLoading, user]);
+
+    useEffect(() => {
+        if (!userLoading && user) {
+            fetchItems(page, selectedCategory, debouncedSearchQuery);
+        }
+    }, [page, fetchItems, selectedCategory, debouncedSearchQuery, userLoading, user]);
 
     const handleScroll = useCallback(() => {
         if (window.innerHeight + document.documentElement.scrollTop + 1 >= document.documentElement.scrollHeight && hasMore) {
@@ -101,7 +117,7 @@ const Home: React.FC = () => {
         setItems([]);
         setPage(1);
         setHasMore(true);
-        fetchItems(1, selectedCategory);
+        fetchItems(1, selectedCategory, debouncedSearchQuery);
     };
 
     const handleCategoryChange: any = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -109,8 +125,22 @@ const Home: React.FC = () => {
         setItems([]);
         setPage(1);
         setHasMore(true);
-        fetchItems(1, event.target.value as string);
+        fetchItems(1, event.target.value as string, debouncedSearchQuery);
     };
+
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(event.target.value);
+    };
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearchQuery(searchQuery);
+        }, 1000);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [searchQuery]);
 
     if (userLoading) {
         return <CircularProgress />;
@@ -138,11 +168,18 @@ const Home: React.FC = () => {
 
             {feeds.length > 0 && (
                 <div>
-                    <SubscribedFeeds />
+                    <SubscribedFeeds view={'mini'} />
                     <Divider sx={{ my: 2 }} />
-                    <Typography variant="h4" gutterBottom>
-                        <RefetchButton onRefetch={handleRefetch} />
-                        <FormControl variant="outlined" sx={{ minWidth: 120, ml: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Typography variant="h4" gutterBottom>
+                            {/*Feed Items*/}
+                        </Typography>
+                        <IconButton onClick={handleRefetch}>
+                            <RefreshIcon />
+                        </IconButton>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                        <FormControl variant="outlined" sx={{ minWidth: 120, mr: 2 }}>
                             <InputLabel id="category-select-label">Category</InputLabel>
                             <Select
                                 labelId="category-select-label"
@@ -159,7 +196,14 @@ const Home: React.FC = () => {
                                 ))}
                             </Select>
                         </FormControl>
-                    </Typography>
+                        <TextField
+                            variant="outlined"
+                            placeholder="Search..."
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                            sx={{ flex: 1 }}
+                        />
+                    </Box>
                     <List>
                         {items.map((item) => (
                             <FeedItemPreview key={item._id} item={item} user={user} />

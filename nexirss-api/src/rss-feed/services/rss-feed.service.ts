@@ -102,7 +102,8 @@ export class RssFeedService {
     page: number,
     limit: number,
     feeds?: string[],
-    category?: string, // Assuming category is of type string
+    category?: string,
+    search?: string,
   ): Promise<RssItem[]> {
     const skip = (page - 1) * limit;
     const feedQuery: any = {};
@@ -123,6 +124,15 @@ export class RssFeedService {
     const itemQuery: any = {
       feed: { $in: matchingFeedIds },
     };
+
+    if (search) {
+      itemQuery.$or = [
+        { title: { $regex: new RegExp(search, 'i') } }, // Case-insensitive regex for title
+        { content: { $regex: new RegExp(search, 'i') } }, // Case-insensitive regex for content
+      ];
+    }
+
+    console.log('itemQuery:', itemQuery);
 
     return this.rssItemModel
       .find(itemQuery, { plot_embedding: 0 })
