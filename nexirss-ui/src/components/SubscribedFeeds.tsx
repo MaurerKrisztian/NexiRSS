@@ -9,13 +9,23 @@ interface Feed {
     title: string;
     image: string;
     description: string;
+    category: string;
 }
 
 interface SubscribedFeedsProps {
     view?: 'mini' | 'full';
 }
 
-const placeholderImage = 'https://via.placeholder.com/150';
+const placeholderImage = {
+    default:'https://via.placeholder.com/150',
+    YOUTUBE: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAUlFOxGAxkxairx9qfOn5FrGdudFXFt8UIw&s',
+    VIDEO: 'https://martialartspasadenantc.com/wp-content/uploads/sites/185/2015/12/video-placeholder.png',
+    PODCAST: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnHFvXuvVLmc-Sup2dnF3aRcOW7cNn9HK2Cw&s',
+}
+
+function getDefaultImage(category: string) {
+    return placeholderImage[category] || placeholderImage.default
+}
 
 const SubscribedFeeds: React.FC<SubscribedFeedsProps> = ({ view = 'full' }) => {
     const [feeds, setFeeds] = useState<Feed[]>([]);
@@ -75,7 +85,7 @@ const SubscribedFeeds: React.FC<SubscribedFeedsProps> = ({ view = 'full' }) => {
                                             component="img"
                                             alt={feed.title}
                                             height="122"
-                                            image={feed.image || placeholderImage}
+                                            image={feed.image || getDefaultImage(feed.category)}
                                             title={feed.title}
                                         />
                                         <CardContent>
@@ -90,7 +100,7 @@ const SubscribedFeeds: React.FC<SubscribedFeedsProps> = ({ view = 'full' }) => {
                                     <Box sx={{ textAlign: 'center', m: 1 }}>
                                         <Tooltip title={feed.title} arrow placement="top">
                                             <Avatar
-                                                src={feed.image || placeholderImage}
+                                                src={feed.image || getDefaultImage(feed.category)}
                                                 alt={feed.title}
                                                 sx={{
                                                     width: 56,

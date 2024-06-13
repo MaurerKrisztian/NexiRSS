@@ -6,7 +6,7 @@ import {
     Container, AppBar, Toolbar, Typography, Box, Button, IconButton, Drawer, List, ListItem, ListItemText, useMediaQuery
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import { BrowserRouter as Router, Route, Routes, Link, Navigate } from 'react-router-dom';
+import { HashRouter as Router, Route, Routes, Link, Navigate } from 'react-router-dom';
 import FeedList from './components/FeedList';
 import FeedForm from './components/FeedForm';
 import PostContent from './components/PostContent';

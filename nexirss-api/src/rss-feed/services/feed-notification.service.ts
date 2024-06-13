@@ -47,7 +47,9 @@ export class FeedNotificationService {
         this.logger.debug('Notify users: ', userIds.join(','));
         this.notificationsService.sendNotification(
           {
-            title: `New RSS post from ${feed.title} available!`,
+            image: `${feed.image}`,
+            icon: item.image || feed.image,
+            title: `${feed.title}  - ${feed?.category?.toLowerCase()}`,
             body: item.title,
             data: { url: item.link },
           },
