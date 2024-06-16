@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, Typography, IconButton, Paper, Button, Alert } from '@mui/material';
-import axios from 'axios';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark-reasonable.css';
@@ -9,6 +8,7 @@ import dateFormat from 'dateformat';
 import { useAudio } from './AudioContext';
 import apiClient, { API_URL } from '../api-client/api';
 import {IUser} from "../hooks/types/IUser";
+import '../index.css';
 
 interface AudioInfo {
     length: string;
@@ -154,10 +154,8 @@ const PostContent: React.FC = () => {
                 )}
                 <Typography variant="body1" gutterBottom>
                     {isYouTubeLink(post.link) && (
-                        <div>
+                        <div className="video-container">
                             <iframe
-                                width="560"
-                                height="315"
                                 src={getYouTubeEmbedUrl(post.link)}
                                 frameBorder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
