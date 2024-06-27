@@ -47,11 +47,7 @@ const Home: React.FC = () => {
         const fetchFeeds = async () => {
             if (user && user.feeds.length > 0) {
                 try {
-                    const response = await apiClient.get(`/rss-feed/user/feeds`, {
-                        params: {
-                            ids: user.feeds.join(',')
-                        }
-                    });
+                    const response = await apiClient.get(`/rss-feed/user/feeds`);
                     const feeds: Feed[] = response.data || [];
                     setFeeds(feeds);
                     const uniqueCategories = Array.from(new Set(feeds.map(feed => feed.category))).filter(e => e !== undefined);
@@ -59,6 +55,7 @@ const Home: React.FC = () => {
                     setLoading(false);
                 } catch (error) {
                     console.error('Error fetching feeds:', error);
+                    setLoading(false); // ensure loading state is updated in case of an error
                 }
             } else {
                 setLoading(false);
@@ -160,7 +157,7 @@ const Home: React.FC = () => {
 
     return (
         <Box sx={{ mt: 2, mx: 'auto', maxWidth: 800, p: 2 }}>
-            {feeds.length === 0 && (
+            {!loading && feeds.length === 0 && (
                 <Alert severity="warning">
                     No feed subscription. Please add a new feed in the <Link to={`/create`}> Feed Manager </Link> tab.
                 </Alert>

@@ -143,8 +143,6 @@ export class RssFeedService {
       ];
     }
 
-    console.log('itemQuery:', itemQuery);
-
     return this.rssItemModel
       .find(itemQuery, { plot_embedding: 0 })
       .sort({ pubDate: -1 })
