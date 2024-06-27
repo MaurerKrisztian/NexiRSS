@@ -87,11 +87,17 @@ export class UserService {
     userId: string,
     feedId: string,
     notifications: boolean,
+    enableAITrigger: boolean,
   ) {
     return this.userModel
       .updateOne(
         { _id: userId, 'feedSubscriptions.feed': new Types.ObjectId(feedId) },
-        { $set: { 'feedSubscriptions.$.notifications': notifications } },
+        {
+          $set: {
+            'feedSubscriptions.$.notifications': notifications,
+            'feedSubscriptions.$.enableAITrigger': enableAITrigger,
+          },
+        },
       )
       .exec();
   }

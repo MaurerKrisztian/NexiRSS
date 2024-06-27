@@ -35,6 +35,7 @@ interface FeedItem {
 
 interface User {
     openaiApiKey?: string;
+    highlightedItems?: { itemId: string }[];
 }
 
 interface FeedItemPreviewProps {
@@ -114,8 +115,10 @@ const FeedItemPreview: React.FC<FeedItemPreviewProps> = ({ item, user }) => {
         }
     };
 
+    const isHighlighted = user?.highlightedItems?.some(highlightedItem => highlightedItem.itemId === item._id);
+
     return (
-        <ListItem component={RouterLink} to={`/items/${item._id}`} button>
+        <ListItem component={RouterLink} to={`/items/${item._id}`} button sx={{ backgroundColor: isHighlighted ? '#2929b8' : 'inherit' }}>
             <Avatar
                 variant="square"
                 src={item.image || item?.feed?.image || placeholderImage}

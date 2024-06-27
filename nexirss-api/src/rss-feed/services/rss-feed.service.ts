@@ -77,10 +77,12 @@ export class RssFeedService {
     return this.feedModel.find({ _id: { $in: objectIds } }).exec();
   }
 
-  async getFeedItems(feedId: string): Promise<RssItem[]> {
+  async getFeedItems(feedId: string, page = 1, limit = 10): Promise<RssItem[]> {
     return this.rssItemModel
       .find({ feed: feedId }, { plot_embedding: 0 })
       .populate('feed')
+      .skip((page - 1) * limit)
+      .limit(limit)
       .exec();
   }
 
@@ -89,6 +91,15 @@ export class RssFeedService {
       .findById(id, { plot_embedding: 0 })
       .populate('feed')
       .exec();
+  }
+
+  async replayEvent(id: string): Promise<RssItem> {
+    const rssItem = await this.rssItemModel
+      .findById(id, { plot_embedding: 0 })
+      .exec();
+
+    this.eventEmitter.emit('rss.item.new', rssItem.toObject());
+    return rssItem;
   }
 
   async getAllFeedItemsOrderedByDate(): Promise<RssItem[]> {

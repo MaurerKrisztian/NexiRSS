@@ -7,7 +7,7 @@ import 'highlight.js/styles/atom-one-dark-reasonable.css';
 import dateFormat from 'dateformat';
 import { useAudio } from './AudioContext';
 import apiClient, { API_URL } from '../api-client/api';
-import {IUser} from "../hooks/types/IUser";
+import { IUser } from "../hooks/types/IUser";
 import '../index.css';
 
 interface AudioInfo {
@@ -38,8 +38,18 @@ const PostContent: React.FC = () => {
     const [audioPosition, setAudioPositionState] = useState<number>(0);
     const [generatingTTS, setGeneratingTTS] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [user, setUser] = useState<IUser | null>(null);
 
     useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const response = await apiClient.get('/auth/me');
+                setUser(response.data);
+            } catch (error) {
+                console.error('Error fetching user:', error);
+            }
+        };
+
         const fetchPost = async () => {
             try {
                 const response = await apiClient.get(`/rss-feed/items/${postId}`);
@@ -53,6 +63,7 @@ const PostContent: React.FC = () => {
             }
         };
 
+        fetchUser();
         fetchPost();
     }, [postId]);
 
@@ -81,9 +92,7 @@ const PostContent: React.FC = () => {
     };
 
     const handleGenerateTTS = async () => {
-        const response = await apiClient.get('/auth/me');
-        const user: IUser = response.data;
-        if (!user.openaiApiKey) {
+        if (!user?.openaiApiKey) {
             setErrorMessage('Please setup the OpenAI API key in the profile to use this feature.');
             return;
         }
@@ -97,6 +106,14 @@ const PostContent: React.FC = () => {
             console.error('Error generating TTS:', error);
         }
         setGeneratingTTS(false);
+    };
+
+    const handleReplayItemEvent = async () => {
+        try {
+            await apiClient.get(`rss-feed/items/${postId}/replay-event`);
+        } catch (error) {
+            console.error('Error replaying item event:', error);
+        }
     };
 
     const isYouTubeLink = (url: string) => {
@@ -173,6 +190,11 @@ const PostContent: React.FC = () => {
                     <OpenInNewIcon />
                 </IconButton>
             </Paper>
+            {user?.isDebugger && (
+                <Button variant="contained" color="primary" onClick={handleReplayItemEvent} sx={{ mt: 2 }}>
+                    Replay new item event
+                </Button>
+            )}
         </Box>
     );
 };

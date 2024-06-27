@@ -3,6 +3,11 @@ import { Document, Schema as MongooseSchema } from 'mongoose';
 export interface IFeedSubscription {
   feed: string;
   notifications: boolean;
+  enableAITrigger: boolean;
+}
+export interface IHighlightedItem {
+  itemId: string;
+  trigger?: AiAnalysisSetting;
 }
 
 @Schema()
@@ -21,6 +26,18 @@ export class AiAnalysisSetting {
 }
 
 const AiAnalysisSettingSchema = SchemaFactory.createForClass(AiAnalysisSetting);
+
+@Schema({ _id: false })
+export class HighlightedItem implements IHighlightedItem {
+  @Prop({ required: true })
+  itemId: string;
+
+  @Prop({ required: false, type: AiAnalysisSetting })
+  trigger?: AiAnalysisSetting;
+}
+
+export const HighlightedItemSchema =
+  SchemaFactory.createForClass(HighlightedItem);
 
 @Schema({
   strict: false,
@@ -42,6 +59,7 @@ export class User extends Document {
       {
         feed: { type: MongooseSchema.Types.ObjectId, ref: 'Feed' },
         notifications: { type: Boolean, default: false },
+        enableAITrigger: { type: Boolean, default: false },
       },
     ],
     required: false,
@@ -54,6 +72,12 @@ export class User extends Document {
 
   @Prop({ type: [AiAnalysisSettingSchema], required: false, default: [] })
   aiAnalysisSettings: AiAnalysisSetting[];
+
+  @Prop({ type: [HighlightedItemSchema], required: false, default: [] })
+  highlightedItems: IHighlightedItem;
+
+  @Prop({ default: false, required: false })
+  isDebugger: boolean;
 
   get feeds() {
     return this.feedSubscriptions.map((sub) => sub.feed);

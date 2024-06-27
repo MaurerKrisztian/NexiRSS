@@ -13,7 +13,6 @@ import PostContent from './components/PostContent';
 import Home from './components/Home';
 import CategoryItems from './components/CategoryItems';
 import FeedItemsByFeedId from './components/FeedItemsByFeedId';
-import SearchBar from './components/SearchBar';
 import { AudioProvider } from './components/AudioContext';
 import MediaPlayer from './components/MediaPlayer';
 import { GoogleOAuthProvider } from '@react-oauth/google';

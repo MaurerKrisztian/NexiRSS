@@ -47,13 +47,19 @@ export class RssFeedUserController {
 
   @Patch('update-feed')
   async updateFeed(
-    @Body() feedSubscription: { feedId: string; notifications?: boolean },
+    @Body()
+    feedSubscription: {
+      feedId: string;
+      notifications?: boolean;
+      enableAITrigger?: boolean;
+    },
     @AuthUser() user: User,
   ) {
     return this.userService.updateFeedSubscription(
       user._id,
       feedSubscription.feedId,
       feedSubscription.notifications,
+      feedSubscription.enableAITrigger,
     );
   }
   @Delete('remove-feed')

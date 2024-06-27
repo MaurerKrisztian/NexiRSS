@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { List, Typography, CircularProgress, Box, Paper, CardMedia, Divider, Button, IconButton } from '@mui/material';
+import { List, Typography, CircularProgress, Box, Paper, CardMedia, Divider, Button, IconButton, FormControlLabel, Checkbox } from '@mui/material';
 import { Notifications, NotificationsOff } from '@mui/icons-material';
 import FeedItemPreview from './FeedItemPreview';
 import apiClient from "../api-client/api";
@@ -38,31 +38,16 @@ const FeedItemsByFeedId: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+    const [aiTriggerEnabled, setAiTriggerEnabled] = useState(false);
+    const [page, setPage] = useState(1);
+    const [limit] = useState(10); // Set the limit of items per page
 
     useEffect(() => {
         const fetchFeedDetails = async () => {
             try {
                 const feedResponse = await apiClient.get(`/rss-feed/feeds/${feedId}`);
                 setFeed(feedResponse.data);
-
-                const itemsResponse = await apiClient.get(`/rss-feed/feeds/${feedId}/items`);
-                const itemsWithAudioLength = await Promise.all(
-                    itemsResponse.data.map(async (item: FeedItem) => {
-                        if (item.audioInfo && !item.audioInfo.length) {
-                            try {
-                                const headResponse = await apiClient.head(item.audioInfo.url);
-                                const contentLength = headResponse.headers['content-length'];
-                                if (contentLength) {
-                                    item.audioInfo.length = Number(contentLength);
-                                }
-                            } catch (error) {
-                                console.error('Error fetching audio length:', error);
-                            }
-                        }
-                        return item;
-                    })
-                );
-                setItems(itemsWithAudioLength);
+                await fetchItems(page, limit);
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching feed details and items:', error);
@@ -76,6 +61,7 @@ const FeedItemsByFeedId: React.FC = () => {
                 const subscribedFeed = subscribedFeeds.find((sub: any) => sub.feed === feedId);
                 setIsSubscribed(!!subscribedFeed);
                 setNotificationsEnabled(subscribedFeed?.notifications || false);
+                setAiTriggerEnabled(subscribedFeed?.enableAITrigger || false);
             } catch (error) {
                 console.error('Error checking subscription status:', error);
             }
@@ -83,11 +69,36 @@ const FeedItemsByFeedId: React.FC = () => {
 
         fetchFeedDetails();
         checkSubscriptionStatus();
-    }, [feedId]);
+    }, [feedId, page, limit]);
+
+    const fetchItems = async (page: number, limit: number) => {
+        try {
+            const itemsResponse = await apiClient.get(`/rss-feed/feeds/${feedId}/items`, { params: { page, limit } });
+            const itemsWithAudioLength = await Promise.all(
+                itemsResponse.data.map(async (item: FeedItem) => {
+                    if (item.audioInfo && !item.audioInfo.length) {
+                        try {
+                            const headResponse = await apiClient.head(item.audioInfo.url);
+                            const contentLength = headResponse.headers['content-length'];
+                            if (contentLength) {
+                                item.audioInfo.length = Number(contentLength);
+                            }
+                        } catch (error) {
+                            console.error('Error fetching audio length:', error);
+                        }
+                    }
+                    return item;
+                })
+            );
+            setItems((prevItems) => [...prevItems, ...itemsWithAudioLength]);
+        } catch (error) {
+            console.error('Error fetching items:', error);
+        }
+    };
 
     const handleSubscribe = async () => {
         try {
-            await apiClient.post('/rss-feed/user/add-feed', { feedId, notifications: notificationsEnabled });
+            await apiClient.post('/rss-feed/user/add-feed', { feedId, notifications: notificationsEnabled, enableAITrigger: aiTriggerEnabled });
             setIsSubscribed(true);
             await refreshUser();
         } catch (error) {
@@ -110,7 +121,7 @@ const FeedItemsByFeedId: React.FC = () => {
 
         try {
             const newNotificationStatus = !notificationsEnabled;
-            await apiClient.patch('/rss-feed/user/update-feed', { feedId, notifications: newNotificationStatus });
+            await apiClient.patch('/rss-feed/user/update-feed', { feedId, notifications: newNotificationStatus, enableAITrigger: aiTriggerEnabled });
             setNotificationsEnabled(newNotificationStatus);
             await refreshUser();
         } catch (error) {
@@ -118,9 +129,21 @@ const FeedItemsByFeedId: React.FC = () => {
         }
     };
 
-    // if (loading || userLoading) {
-    //     return <CircularProgress />;
-    // }
+    const toggleAiTrigger = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const newAITriggerStatus = event.target.checked;
+
+        try {
+            await apiClient.patch('/rss-feed/user/update-feed', { feedId, notifications: notificationsEnabled, enableAITrigger: newAITriggerStatus });
+            setAiTriggerEnabled(newAITriggerStatus);
+            await refreshUser();
+        } catch (error) {
+            console.error('Error updating AI Trigger status:', error);
+        }
+    };
+
+    const loadMore = () => {
+        setPage((prevPage) => prevPage + 1);
+    };
 
     if (userError) {
         return (
@@ -157,9 +180,16 @@ const FeedItemsByFeedId: React.FC = () => {
                             {isSubscribed ? "Unsubscribe" : "Subscribe"}
                         </Button>
                         {isSubscribed && (
-                            <IconButton onClick={toggleNotifications} sx={{ ml: 2 }}>
-                                {notificationsEnabled ? <Notifications /> : <NotificationsOff />}
-                            </IconButton>
+                            <>
+                                <IconButton onClick={toggleNotifications} sx={{ ml: 2 }}>
+                                    {notificationsEnabled ? <Notifications /> : <NotificationsOff />}
+                                </IconButton>
+                                <FormControlLabel
+                                    control={<Checkbox checked={aiTriggerEnabled} onChange={toggleAiTrigger} />}
+                                    label="Enable AI Trigger Analytics"
+                                    sx={{ ml: 2 }}
+                                />
+                            </>
                         )}
                     </Box>
                     <Divider sx={{ my: 2 }} />
@@ -174,6 +204,13 @@ const FeedItemsByFeedId: React.FC = () => {
                         <FeedItemPreview key={item._id} item={item} user={user} />
                     ))}
                 </List>
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                    {loading ? <CircularProgress /> : (
+                        <Button onClick={loadMore} variant="contained" color="primary">
+                            Load More
+                        </Button>
+                    )}
+                </Box>
             </Paper>
         </Box>
     );

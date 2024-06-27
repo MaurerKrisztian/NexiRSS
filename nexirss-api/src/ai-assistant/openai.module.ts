@@ -10,8 +10,10 @@ import { RssFeedModule } from '../rss-feed/rss-feed.module';
 import { TOOL_PROVIDER_METADATA } from './services/fn-call/decorators/tool.decorator';
 import { Explorer } from './services/fn-call/explorer/explorer';
 import { DiscoveryService } from '@nestjs/core';
+import { UserTriggerAiService } from './services/user-trigger-ai.service';
+import { HighlightItemTool } from './services/fn-call/tools/highlight-item.tool';
 
-const tools: Type<ITool>[] = [LabelTool];
+const tools: Type<ITool>[] = [LabelTool, HighlightItemTool];
 @Module({
   imports: [RssFeedModule],
   providers: [
@@ -22,6 +24,7 @@ const tools: Type<ITool>[] = [LabelTool];
     ToolProvider,
     Explorer,
     DiscoveryService,
+    UserTriggerAiService,
   ],
   controllers: [AiAssistantController],
   exports: [OpenAiService, AiAnalysisService],

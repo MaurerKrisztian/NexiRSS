@@ -23,4 +23,5 @@ export interface IUser {
     openaiApiKey?: string;
     aiAnalysisSettings: AiAnalysisSetting[];
     feeds: string[];
+    isDebugger: boolean
 }

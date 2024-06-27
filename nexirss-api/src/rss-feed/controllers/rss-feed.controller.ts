@@ -65,8 +65,12 @@ export class RssFeedController {
   }
 
   @Get('feeds/:feedId/items')
-  async getFeedItems(@Param('feedId') feedId: string): Promise<RssItem[]> {
-    return this.rssFeedService.getFeedItems(feedId);
+  async getFeedItems(
+    @Param('feedId') feedId: string,
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ): Promise<RssItem[]> {
+    return this.rssFeedService.getFeedItems(feedId, page, limit);
   }
 
   @Get('items')
@@ -77,6 +81,11 @@ export class RssFeedController {
   @Get('items/:id')
   async getItemById(@Param('id') id: string): Promise<RssItem> {
     return this.rssFeedService.getItemById(id);
+  }
+
+  @Get('items/:id/replay-event')
+  async debugItemEvent(@Param('id') id: string): Promise<RssItem> {
+    return this.rssFeedService.replayEvent(id);
   }
 
   @Get('categories/:category/items')
