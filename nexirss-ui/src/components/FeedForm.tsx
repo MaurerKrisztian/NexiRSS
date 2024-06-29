@@ -18,6 +18,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import apiClient from "../api-client/api";
 import BrowsFeeds from "./BrowsFeeds";
 import useUser from "../hooks/useUser";
+import RSSFeedImporterExporter from "./rss-import-export";
 
 interface Feed {
     _id: string;
@@ -125,6 +126,7 @@ const FeedForm: React.FC = () => {
         <Box sx={{ mt: 2, mx: 'auto', maxWidth: 600, p: 2 }}>
             <BrowsFeeds></BrowsFeeds>
             <hr/>
+            <RSSFeedImporterExporter></RSSFeedImporterExporter>
             <Paper elevation={3} sx={{ p: 3 }}>
                 <Box component="form" onSubmit={handleSubmit}>
                     <Typography variant="h5" gutterBottom>

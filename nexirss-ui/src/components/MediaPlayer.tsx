@@ -17,11 +17,14 @@ const MediaPlayer: React.FC = () => {
 
     return (
         <Box sx={{ position: 'fixed', bottom: 0, width: '100%', bgcolor: '#202325', p: 2, boxShadow: 3, color: 'white', display: 'flex', alignItems: 'center' }}>
+            <Link to={`/items/${postId}`} style={{ color: 'white', textDecoration: 'none' }}>
             {imageUrl && (
                 <Box sx={{ mr: 2 }}>
                     <img src={imageUrl} alt="Feed or Item" style={{ width: 60, height: 60, borderRadius: '50%' }} />
                 </Box>
             )}
+
+            </Link>
             <Box sx={{ flexGrow: 1 }}>
                 {postId && (
                     <Typography variant="body1">
@@ -30,7 +33,8 @@ const MediaPlayer: React.FC = () => {
                         </Link>
                     </Typography>
                 )}
-                <Typography variant="body2" color="textSecondary">{feedTitle}</Typography>
+                {/*TODO: link to feed*/}
+                <Typography variant="body2" color="textSecondary">  <Link to={`/items/${postId}`} style={{ color: 'white', textDecoration: 'none' }}>{feedTitle}</Link></Typography>
                 <audio
                     controls
                     style={{ width: '100%', backgroundColor: 'transparent', color: 'black' }}

@@ -56,12 +56,15 @@ export class FetchRssFeedService {
       if (userId) {
         await this.userService.addFeedToUser(userId, feed._id);
       }
-    } else {
-      if (category) {
-        feed.category = category;
-      }
-      await feed.save();
     }
+
+    if (userId) {
+      await this.userService.addFeedToUser(userId, feed._id);
+    }
+    if (category) {
+      feed.category = category;
+    }
+    await feed.save();
     return feed;
   }
 
@@ -137,6 +140,6 @@ export class FetchRssFeedService {
   private handleFetchError(url: string, error: Error) {
     console.error('RssFeedService', error.message);
     this.logger.error(`Failed to fetch RSS feed from ${url}`, error.stack);
-    throw new Error(`Failed to fetch RSS feed from ${url}`);
+    // throw new Error(`Failed to fetch RSS feed from ${url}`);
   }
 }

@@ -13,6 +13,11 @@ import { FetchRssFeedService } from './services/fetch-rss-feed.service';
 import { FetchAllFeedsCronService } from './services/fetch-all-feeds-cron.service';
 import { NotificationModule } from '../notification/notification.module';
 import { NotificationsService } from '../notification/notifications.service';
+import { ExportOmplService } from './services/import-export/export-ompl.service';
+import { ExportFeedService } from './services/import-export/export-feed.service';
+import { ImportFeedService } from './services/import-export/import-feed.service';
+import { OmplParser } from './services/import-export/ompl-parser.service';
+import { ImportExportController } from './controllers/import-export.controller';
 
 @Module({
   imports: [
@@ -25,13 +30,22 @@ import { NotificationsService } from '../notification/notifications.service';
   ],
   providers: [
     RssFeedService,
+    ExportOmplService,
+    ExportFeedService,
     TTSService,
     FeedNotificationService,
     FetchRssFeedService,
     FetchAllFeedsCronService,
     NotificationsService,
+    ImportFeedService,
+    OmplParser,
   ],
-  controllers: [RssFeedController, RssFeedUserController, TTSController],
+  controllers: [
+    RssFeedController,
+    RssFeedUserController,
+    TTSController,
+    ImportExportController,
+  ],
   exports: [MongooseModule],
 })
 export class RssFeedModule {}
