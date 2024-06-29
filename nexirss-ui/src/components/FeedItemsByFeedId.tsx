@@ -6,6 +6,7 @@ import FeedItemPreview from './FeedItemPreview';
 import apiClient from "../api-client/api";
 import { requestPermission } from "../utils/permission.util";
 import useUser from "../hooks/useUser";
+import {getDefaultImage} from "./SubscribedFeeds";
 
 interface AudioInfo {
     length?: number;
@@ -19,6 +20,7 @@ interface Feed {
     title: string;
     image: string;
     description: string;
+    category: string;
 }
 
 interface FeedItem {
@@ -161,7 +163,7 @@ const FeedItemsByFeedId: React.FC = () => {
                         component="img"
                         alt={feed.title}
                         height="200"
-                        image={feed.image}
+                        image={feed.image || getDefaultImage(feed.category)}
                         title={feed.title}
                         sx={{ borderRadius: '8px', mb: 2 }}
                     />
@@ -195,9 +197,6 @@ const FeedItemsByFeedId: React.FC = () => {
                     <Divider sx={{ my: 2 }} />
                 </>
             )}
-            <Typography variant="h4" gutterBottom>
-                Feed Items
-            </Typography>
             <Paper elevation={3} sx={{ p: 2 }}>
                 <List>
                     {items.map((item) => (
