@@ -12,6 +12,7 @@ import { Explorer } from './services/fn-call/explorer/explorer';
 import { DiscoveryService } from '@nestjs/core';
 import { UserTriggerAiService } from './services/user-trigger-ai.service';
 import { HighlightItemTool } from './services/fn-call/tools/highlight-item.tool';
+import { SentimentAnalyticsService } from './sentiment-analytics/sentiment-analytics.service';
 
 const tools: Type<ITool>[] = [LabelTool, HighlightItemTool];
 @Module({
@@ -25,6 +26,7 @@ const tools: Type<ITool>[] = [LabelTool, HighlightItemTool];
     Explorer,
     DiscoveryService,
     UserTriggerAiService,
+    SentimentAnalyticsService,
   ],
   controllers: [AiAssistantController],
   exports: [OpenAiService, AiAnalysisService],
