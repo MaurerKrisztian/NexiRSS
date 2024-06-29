@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import {Link, useParams} from 'react-router-dom';
 import { Box, Typography, IconButton, Paper, Button, Alert } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import hljs from 'highlight.js';
@@ -25,6 +25,7 @@ interface Post {
     audioInfo?: AudioInfo;
     ttsAudioId?: string;
     feed?: {
+        _id: string;
         title: string;
         image?: string;
     };
@@ -137,8 +138,9 @@ const PostContent: React.FC = () => {
                     {post.title}
                 </Typography>
                 <Typography variant="body2" color="textSecondary" gutterBottom>
-                    {dateFormat(new Date(post.pubDate), 'dddd, mmmm dS, yyyy, h:MM:ss TT')}
-                </Typography>
+                    <Link to={`/feeds/${post.feed._id}/items`} style={{ textDecoration: 'none', color: '#90caf9' }}>{post.feed.title} </Link>
+                    - {dateFormat(new Date(post.pubDate), 'dddd, mmmm dS, yyyy, h:MM:ss TT')}
+                 </Typography>
                 {post.audioInfo && (
                     <Box sx={{ mt: 2 }}>
                         <Button onClick={() => playAudio(post.audioInfo.url, post.title, post.feed?.title || 'Unknown Feed', post.feed?.image || '', post._id, audioPosition)}>

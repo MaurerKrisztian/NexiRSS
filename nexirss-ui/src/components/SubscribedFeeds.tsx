@@ -23,7 +23,7 @@ const placeholderImage = {
     PODCAST: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnHFvXuvVLmc-Sup2dnF3aRcOW7cNn9HK2Cw&s',
 }
 
-function getDefaultImage(category: string) {
+export function getDefaultImage(category: string) {
     return placeholderImage[category] || placeholderImage.default
 }
 

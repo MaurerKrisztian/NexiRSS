@@ -3,6 +3,7 @@ import { Box, Typography, Card, CardContent, CardMedia, Grid } from '@mui/materi
 import { Link } from 'react-router-dom';
 import apiClient from "../api-client/api";
 import BrowsFeeds from "./BrowsFeeds";
+import {getDefaultImage} from "./SubscribedFeeds";
 
 interface Feed {
     _id: string;
@@ -10,9 +11,9 @@ interface Feed {
     title: string;
     image: string;
     description: string;
+    category: string;
 }
 
-const placeholderImage = 'https://via.placeholder.com/150';
 
 const FeedListPage: React.FC = () => {
     const [feeds, setFeeds] = useState<Feed[]>([]);
@@ -51,7 +52,7 @@ const FeedListPage: React.FC = () => {
                                     component="img"
                                     alt={feed.title}
                                     height="140"
-                                    image={feed.image || placeholderImage}
+                                    image={feed.image || getDefaultImage(feed.category)}
                                     title={feed.title}
                                 />
                                 <CardContent>
